@@ -904,10 +904,14 @@ doc ///
        Text  
            The algorithm is based on the following result by Eisenbud-Huneke-Vasconcelos, 
 	   in their 1993 Inventiones Mathematicae paper:
+	   
 	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all d
+	   
 	   $\bullet$ If P is an associated prime of M of codimension d := codim P > codim M, 
 	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in P
+	   
 	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension d.
+	   
        Example
            R = QQ[x,y,z,a,b]
      	   J = intersect(ideal(x,y,z),ideal(a,b))
