@@ -1,13 +1,12 @@
 newPackage(
         "SymbolicPowers",
-	Version => "1.0", 
-	Date => "July 21st, 2017",
+	Version => "1.1", 
+	Date => "November 8, 2017",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@virginia.edu", HomePage => "http://people.virginia.edu/~er2eq/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
-	DebuggingMode => false,
-	PackageExports => {"Depth"}
+	DebuggingMode => false
         )
 
 
@@ -26,7 +25,6 @@ export {
     "exponentsMonomialGens", 
     "frobeniusPower",       
     "joinIdeals",    
-    "isGorenstein",
     "isKonig", 
     "isPacked", 
     "isSymbolicEqualOrdinary",
@@ -45,7 +43,7 @@ export {
     "symbolicPowerMonomialCurve", 
     "symbPowerPrimePosChar",
     "symbolicPolyhedron", 
-    "unmixedPart",
+    "minimalPart",
     "waldschmidt"
     }
 
@@ -107,8 +105,8 @@ assPrimesHeight(Ideal) := List => I -> (
 
 
 
-unmixedPart = method()
-unmixedPart(Ideal) := Ideal => I -> (minPrimes := minimalPrimes (I);
+minimalPart = method()
+minimalPart(Ideal) := Ideal => I -> (minPrimes := minimalPrimes (I);
     primDec := primaryDecomposition(I);
     minComponents := {};
     scan(primDec, i -> (rad := radical(i); scan(minPrimes, a -> 
@@ -171,7 +169,7 @@ symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (if not(isPrime(I))
     
 symbPowerPrimary = method()
 symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (if not(isPrimary(I)) 
-    then "Not a prime ideal" else (rad := radical(I);
+    then "Not a primary ideal" else (rad := radical(I);
 	local result;
 	primaryList := primaryDecomposition(fastPower(I,n)); 
 	scan(primaryList,i->(if radical(i)==rad then result := i; break));
@@ -193,7 +191,7 @@ symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (assI := associatedPrimes(I);
 symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 
-    if opts.UseMinimalPrimes then return (unmixedPart fastPower(I,n));
+    if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
         
     if not opts.UseMinimalPrimes then (    
     	if (codim I == dim R - 1 and isHomogeneous(I)) then (
@@ -494,6 +492,7 @@ symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
     # flatten entries mingens F(X)
       )
 
+{*
 -- To be placed in Depth.m2
 -- Should look at the h-vector instead. 
 isGorenstein = method()
@@ -513,7 +512,7 @@ isGorenstein(Ideal) := Boolean => I ->(
     R = ring I;
     return isGorenstein(R/I);
     )
-
+*}
 
 
 
@@ -622,26 +621,32 @@ document {
   Headline => "A package for computing symbolic powers of ideals",
    
    "This package gives the ability to compute symbolic powers, and related invarients,
-   of ideals in a polynomial ring or a quotient of a polynomial
-   ring. For example, in the context of the default behavoir of ", 
-   TO "symbolicPower", " assumes the following definition of the symbolic power of an ideal ", TEX /// I ///, ",", 
+   of ideals in a polynomial ring or a quotient of a polynomial ring. For example, 
+   in the context of the default behavoir, ", TO "symbolicPower", " assumes the 
+   following definition of the symbolic power of an ideal ", TEX /// I ///, ",", 
    TEX /// $$I^{(n)} = \cap_{p \in Ass(R/I)}(I^nR_p \cap R ),$$ ///,
    "as defined by M. Hochster and C. Huneke.",
 
-   PARA {"Alternatively, as defined in Villarreal, ", TO "symbolicPower", " has the option to restrict to 
-       minimal primes versus use all associated primes with ", TO "UseMinimalPrimes", ".",
-       "In particular, the symbolic power of an ideal ", TEX /// I ///, " is defined as",
-       TEX /// $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$ ///,
-       "where ", TEX /// Min(R/I) ///, " is the set of minimal primes in ", 
+   PARA {"Alternatively, as defined in Villarreal, ", TO "symbolicPower", 
+       " has the option to restrict to minimal primes versus use all associated 
+       primes with ", TO "UseMinimalPrimes", ".", "In particular, the 
+       symbolic power of an ideal ", TEX ///I ///, " is defined as", 
+       TEX /// $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$ ///, 
+       "where ", TEX /// Min(R/I)///, " is the set of minimal primes in ", 
        TEX /// I ///, "."},
-   UL {
-       {"M. Hochster and C. Huneke.", EM " Comparison of symbolic and ordinary powers of ideals.", " Invent. Math. 147 (2002), no. 2, 349–369."},
-       {"R. Villarreal.", EM " Monomial algebras.", " Second edition. Monographs and Research Notes in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5."},
-      },
+   
+   UL { 
+       {"M. Hochster and C. Huneke.", EM " Comparison of symbolic and ordinary powers of ideals.", 
+	   " Invent. Math. 147 (2002), no. 2, 349–369."}, 
+       {"R. Villarreal.", EM " Monomial algebras.", " Second edition. Monographs and Research Notes 
+	   in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5."}, 
+       {"Hailong Dao, Alessandro De Stefani, Eloísa Grifo, Craig Huneke, and Luis Núñez-Betancourt.", 
+	   EM "Symbolic powers of ideals", ", ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010")} 
+       },
   
-   SUBSECTION "Contributors",     
-   "The following people have generously contributed code or worked on our code at various
-   Macaulay2 workshops.",
+   SUBSECTION "Contributors", "The following people have generously
+   contributed code or worked on our code at various Macaulay2
+   workshops.",
      
      UL {
 	 "Ben Drabkin",
@@ -1462,7 +1467,7 @@ doc ///
 	   I = ideal(x*y,y*z,x*z);
 	   symbolicPolyhedron(I)
         
-     SeeAlso 
+     SeeAlso
 	  Polyhedra
 ///
 
@@ -1636,7 +1641,12 @@ TEST ///
 R=QQ[w,x,y,z]
 I=ideal(x*y+1,w*y*z)
 assert(symbolicPower(I,3)==ideal(w^3*z^3,w^2*x*y*z^2+w^2*z^2,w*x^2*y^2*z+2*w*x*y*z+w*z,x^3*y^3+3*x^2*y^2+3*x*y+1))
+///
 
+TEST ///
+R = QQ[x,y,z]
+I = ideal"x,y"
+assert(symbolicPower(I,2)==I^2)
 ///
 
 
