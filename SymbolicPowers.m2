@@ -794,7 +794,7 @@ doc ///
        bigHeight
        (bigHeight, Ideal)
    Headline
-       Big height of an ideal: the largest height of an associated prime
+       computes the big height of an ideal
    Usage
        bigHeight(I)
    Inputs
@@ -804,11 +804,15 @@ doc ///
            the largest height of an associated prime of I
    Description
        Text  
+       	   Big height of an ideal: the largest height of an associated prime. 
            The algorithm is based on the following result by Eisenbud-Huneke-Vasconcelos, 
 	   in their 1993 Inventiones Mathematicae paper:
+	   
 	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all d
+	   
 	   $\bullet$ If P is an associated prime of M of codimension d := codim P > codim M, 
 	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in P
+	   
 	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension d.
        Example
            R = QQ[x,y,z,a,b]
@@ -978,7 +982,7 @@ doc ///
        isSymbolicEqualOrdinary
        (isSymbolicEqualOrdinary, Ideal, ZZ)
    Headline
-       Given a radical ideal I and an integer n, returns true if and only if $I^n=I^{(n)}$.
+    	tests if symbolic power is equal to ordinary power       
    Usage
        	isSymbolicEqualOrdinary(I,n)
    Inputs
@@ -989,7 +993,7 @@ doc ///
            the truth value of $I^n==I^{(n)}$
    Description
        Text
-              Circumvents computing the symbolic powers in most cases, by first testing the bigheigh of $I^n$
+           Given a radical ideal I and an integer $n$, returns true if and only if $I^n=I^{(n)}$. This method circumvents computing the symbolic powers in most cases, by first testing the big height of $I^n$
        Example
               B = QQ[x,y,z];
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -1446,14 +1450,16 @@ doc ///
 doc ///
      Key 
          asymptoticRegularity
+	 (asymptoticRegularity,Ideal)
      Headline 
-         An asymptotic invariant defined as the limit of the regularity of the symbolic powers scaled by the symbolic exponent.
+         approximates the asymptotic regularity 
      Usage 
          asymptoticRegularity(I,SampleSize=>ZZ)
      Description
          Text	  
        	   We give an approximation of the asymptotic regularity by taking the minimum value of $\frac{reg(I^{(n)})}{n}$
-	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize.  
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize;
+	    the default value for SampleSize is 10. 
      
          Example
            R = QQ[x,y,z];
