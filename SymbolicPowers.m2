@@ -30,7 +30,8 @@ export {
     "isSymbolicEqualOrdinary",
     "isSymbPowerContainedinPower", 
     "lowerBoundResurgence",
-    "minDegreeSymbPower", 
+    "minDegreeSymbPower",
+    "minimalPart",
     "noPackedSub", 
     "noPackedAllSubs",
     "squarefreeGens", 
@@ -42,7 +43,6 @@ export {
     "symbolicPowerMonomialCurve", 
     "symbPowerPrimePosChar",
     "symbolicPolyhedron", 
-    "minimalPart",
     "waldschmidt"
     }
 
