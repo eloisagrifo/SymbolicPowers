@@ -888,6 +888,35 @@ doc ///
 
 doc ///
    Key
+       minimalPart
+       (minimalPart, Ideal)
+   Headline
+       intersection of the minimal components
+   Usage
+       minimalPart(I)
+   Inputs
+        I:Ideal
+   Outputs
+       :Ideal
+           the intersection of the components of I corresponding to minimal primes
+   Description
+       Text  
+       	   Eliminates embedded components of a given ideal
+       Example
+           R = QQ[x,y,z,a,b]
+     	   J = intersect(ideal(x^2,y,z^3),ideal(a,b))
+    	   minimalPart(J)
+   SeeAlso
+       assPrimesHeight
+       bigHeight
+       symbolicPower
+///
+
+
+
+
+doc ///
+   Key
        containmentProblem
        (containmentProblem, Ideal, ZZ)
    Headline
@@ -959,7 +988,7 @@ doc ///
 	      
 	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$.
 	      
-	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the unmixed components.
+	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
    Usage
        	symbolicPower(I,n)
    Inputs
