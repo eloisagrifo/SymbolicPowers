@@ -21,9 +21,7 @@ export {
     "asymptoticRegularity",
     "assPrimesHeight",
     "bigHeight",
-    "containmentProblem", 
-    "exponentsMonomialGens", 
-    "frobeniusPower",       
+    "containmentProblem",     
     "joinIdeals",    
     "isKonig", 
     "isPacked", 
@@ -657,7 +655,7 @@ doc ///
 	      
 	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$.
 	      
-	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the unmixed components.
+	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
 ///
 
 
