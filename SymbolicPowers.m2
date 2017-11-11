@@ -903,8 +903,8 @@ doc ///
        Text  
        	   Eliminates embedded components of a given ideal
        Example
-           R = QQ[x,y,z,a,b]
-     	   J = intersect(ideal(x^2,y,z^3),ideal(a,b))
+           R = QQ[x,y,z]
+     	   J = intersect(ideal(x^2,y,z^3),ideal(x,z))
     	   minimalPart(J)
    SeeAlso
        assPrimesHeight
