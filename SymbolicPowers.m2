@@ -490,29 +490,6 @@ symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
     # flatten entries mingens F(X)
       )
 
-{*
--- To be placed in Depth.m2
--- Should look at the h-vector instead. 
-isGorenstein = method()
-isGorenstein(Ring) := Boolean => R ->(
-    local C; local l;
-    
-    if isCM R == false then return false;
-    
-    C = res R.ideal;
-    l = (C.Resolution).length;
-    
-    if rank(C_(l-2)) == 1 then return true else return false;    
-    )
-
-isGorenstein(Ideal) := Boolean => I ->(
-    local R;
-    R = ring I;
-    return isGorenstein(R/I);
-    )
-*}
-
-
 
 
 -----------------------------------------------------------
@@ -577,20 +554,6 @@ lowerBoundResurgence(Ideal, ZZ) := opts  -> (I,m) -> (
     else return max {l, alpha(I)/waldschmidt(I)}
     )
 
---this is not correct
-{*
-upperBoundResurgence = method(TypicalValue => QQ)
-upperBoundResurgence(Ideal, ZZ) := QQ  => (I,m) -> (
-    h := bigHeight I;
-    if m <= 1 then return h 
-    else return 
-    max for o from 2 to m list (
-	    k := h*o-1;  
-	    while isSymbPowerContainedinPower(I,k,o) do k = k-1;
-	    k/o
-	    )
-    ) 
-*}
 
 -- for this function I am assuming that the asymptotic regularity is an infimum
 -- this is more specific than being a limit
