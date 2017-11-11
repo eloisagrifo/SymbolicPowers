@@ -24,7 +24,7 @@ export {
     "containmentProblem",     
     "joinIdeals",    
     "isKonig", 
-    "isPacked", 
+    "isPacked",
     "isSymbolicEqualOrdinary",
     "isSymbPowerContainedinPower", 
     "lowerBoundResurgence",
@@ -36,7 +36,7 @@ export {
     "squarefreeInCodim",    
     "symbolicContainmentMonomialCurve",
     "symbolicDefect",
-    "symbolicPower", 
+    "symbolicPower",
     "symbolicPowerJoin",
     "symbolicPowerMonomialCurve", 
     "symbPowerPrimePosChar",
@@ -46,7 +46,6 @@ export {
 
 
 needsPackage "Polyhedra";
-needsPackage "Depth";
 
 
 
