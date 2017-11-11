@@ -678,7 +678,7 @@ doc ///
 	 Example     
 	      J == P^2
 	 Text
-	      We can also test it a bit faster, without computing the symbolic powers of P:
+	      We can also test it a bit faster, without computing the symbolic powers of $P$.
 	 Example
 	      isSymbolicEqualOrdinary(P,2)
 
@@ -691,7 +691,7 @@ doc ///
      	  "The Containment Problem"
      Description
      	 Text
-	      Given an ideal I, we can determine if $I^{(m)} \subseteq I^n$. For example, here is an ideal that fails the containment $I^{(3)} \subseteq I^2$:
+	      Given an ideal $I$, we can determine if $I^{(m)} \subseteq I^n$. For example, here is an ideal that fails the containment $I^{(3)} \subseteq I^2$:
 	 Example     
 	      B = ZZ/101[x,y,z];
 	      I = ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
@@ -740,7 +740,7 @@ doc ///
      	 Text
 	      To test containments of symbolic and ordinary powers of ideals defining monomial curves, we can skip the step where we define the ideals.
      	 Text
-	      For example, if I is the ideal defining the monomial curve defined by $t^3, t^4, t^5$ over $\mathbb{Z}/101$, we can ask whether $I^{(3)} \subseteq I^2$:
+	      For example, if $I$ is the ideal defining the monomial curve defined by $t^3, t^4, t^5$ over $\mathbb{Z}/101$, we can ask whether $I^{(3)} \subseteq I^2$:
 	 Example     
 	      symbolicContainmentMonomialCurve(ZZ/101,{3,4,5},3,2)
      	 Text
@@ -756,7 +756,7 @@ doc ///
      	  "The Packing Problem"
      Description
      	 Text
-	      Given a square-free monomial ideal I of codimension c, I is Konig if it contains a regular sequence of monomials of length c.
+	      Given a square-free monomial ideal $I$ of codimension $c$, $I$ is Konig if it contains a regular sequence of monomials of length $c$.
      	 
 	      We can test if a given ideal is Konig:
 	 Example     
@@ -764,7 +764,7 @@ doc ///
 	      I = ideal(x*y,z*y,x*z)
 	      isKonig(I)
      	 Text
-	      I is said to have the packing property if any ideal obtained from I by setting any number of variables equal to 0 is Konig.
+	      $I$ is said to have the packing property if any ideal obtained from $I$ by setting any number of variables equal to 0 is Konig.
 	 Example     
 	      isPacked(I)
      	 Text
@@ -808,12 +808,12 @@ doc ///
            The algorithm is based on the following result by Eisenbud-Huneke-Vasconcelos, 
 	   in their 1993 Inventiones Mathematicae paper:
 	   
-	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all d
+	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all $d$
 	   
-	   $\bullet$ If P is an associated prime of M of codimension d := codim P > codim M, 
-	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in P
+	   $\bullet$ If $P$ is an associated prime of $M$ of codimension $d :=$ codim $P > $ codim $M$, 
+	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in $P$
 	   
-	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension d.
+	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension $d$.
        Example
            R = QQ[x,y,z,a,b]
      	   J = intersect(ideal(x,y,z),ideal(a,b))
@@ -841,13 +841,12 @@ doc ///
            The algorithm is based on the following result by Eisenbud-Huneke-Vasconcelos, 
 	   in their 1993 Inventiones Mathematicae paper:
 	   
-	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all d
+	   $\bullet$ codim $Ext^d(M,R) \geq d$ for all $d$
 	   
-	   $\bullet$ If P is an associated prime of M of codimension d := codim P > codim M, 
-	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in P
+	   $\bullet$ If $P$ is an associated prime of $M$ of codimension $d :=$ codim $P > $ codim $M$, 
+	   then codim $Ext^d(M,R) = d$ and the annihilator of $Ext^d(M,R)$ is contained in $P$
 	   
-	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension d.
-	   
+	   $\bullet$ If codim $Ext^d(M,R) = d$, then there really is an associated prime of codimension $d$.	   
        Example
            R = QQ[x,y,z,a,b]
      	   J = intersect(ideal(x,y,z),ideal(a,b))
@@ -929,7 +928,7 @@ doc ///
    Description
        Text  
            Given a prime ideal $I$ in a polynomial ring over a field of positive characteristic, and an integer $n$, 
-	   this method returns the $n$-th symbolic power of $I$.  To compute $I^{(a)}$, find the largest value k with 
+	   this method returns the $n$-th symbolic power of $I$.  To compute $I^{(a)}$, find the largest value $k$ with 
 	   $q = p^k \leq a$. Then $I^{(a)} = (I^{[q]} : I^{a-q+1})$.
        Example 
            B = ZZ/7[x,y,z];
@@ -1000,7 +999,7 @@ doc ///
    Description
        Text
            Given a radical ideal I and an integer $n$, this method returns true if and only if $I^n=I^{(n)}$. 
-	   This method circumvents computing the symbolic powers in most cases, by first testing the big height of $I^n$
+	   This method circumvents computing the symbolic powers in most cases, by first testing the @TO bigHeight@ of $I^n$
        Example
               B = QQ[x,y,z];
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -1423,7 +1422,7 @@ doc ///
 	   
        Text
        	   For ideals that are not monomial, we give an approximation of the Waldschmidt constant by taking the minimum value of $\frac{\alpha(I^{(n)})}{n}$
-	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize.  
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter @TO SampleSize@.  
        
        Example 
 	   R = QQ[x,y,z];
@@ -1461,9 +1460,9 @@ doc ///
      Description	  
          Text
        	   For ideals that are not monomial, we give an approximation of the Waldschmidt constant by taking the minimum value of $\frac{\alpha(I^{(n)})}{n}$
-	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize. Similarly the SampleSize is used to give an
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter @TO SampleSize@. Similarly the @TO SampleSize@ is used to give an
 	   approximation for the asymptotic regularity by computing the smallest value of $\frac{reg(I^{(n)})}{n}$ for $n$ from
-	   1 to the SampleSize.
+	   1 to the @TO SampleSize@.
      
          Example
            R = QQ[x,y,z];
@@ -1481,8 +1480,8 @@ doc ///
      Description	  
          Text
        	   We give an approximation of the asymptotic regularity by taking the minimum value of $\frac{reg(I^{(n)})}{n}$
-	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize;
-	   the default value for SampleSize is 10. 
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter @TO SampleSize@;
+	   the default value for @TO SampleSize@ is 10. 
      
          Example
            R = QQ[x,y,z];
@@ -1510,7 +1509,7 @@ doc ///
          containmentProblem(I,n,InSymbolic => true)
      Description	  
          Text
-       	   Given an ideal I and an integer n, InSymbolic is used to ask the following question:
+       	   Given an ideal I and an integer n, @TO InSymbolic@ is used to ask the following question:
 	   What is the largest power cointained in the symbolic power $I^{(n)}$?
          Example
            R = QQ[x,y,z];
