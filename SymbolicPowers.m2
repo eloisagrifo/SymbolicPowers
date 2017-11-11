@@ -33,7 +33,6 @@ export {
     "minDegreeSymbPower", 
     "noPackedSub", 
     "noPackedAllSubs",
-    --"upperBoundResurgence",
     "squarefreeGens", 
     "squarefreeInCodim",    
     "symbolicContainmentMonomialCurve",
