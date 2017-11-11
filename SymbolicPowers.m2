@@ -820,6 +820,9 @@ doc ///
     	   bigHeight(J)
    SeeAlso
        codim
+       assPrimesHeight
+   Caveat
+       bigHeight works faster than assPrimesHeight
 ///
 
 
@@ -855,6 +858,8 @@ doc ///
    SeeAlso
        bigHeight
        codim
+   Caveat
+       bigHeight works faster than using assPrimesHeight and then taking the maximum
 ///
 
 
