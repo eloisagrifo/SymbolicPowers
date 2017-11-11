@@ -898,7 +898,8 @@ doc ///
        :ZZ
            the minimum value m such that the m-th symbolic power of I is contained in I^n
    Description
-       Given an ideal $I$ and an integer $n$, containementProblem returns the order of the smallest symbolic power of $I$ contained in $I^n$.
+       Text
+       	   Given an ideal $I$ and an integer $n$, containementProblem returns the order of the smallest symbolic power of $I$ contained in $I^n$.
        Example
 	   B = QQ[x,y,z];
 	   f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -1340,6 +1341,31 @@ doc ///
 ///
 
 
+doc ///
+     Key 
+         [lowerBoundResurgence,UseWaldschmidt]
+     Headline 
+         optional input for computing a lower bound for the resurgence of a given ideal.
+     Usage 
+         lowerBoundResurgence(Ideal,ZZ,UseWaldschmidt=>true)
+     Inputs 
+     	  I:Ideal
+	  n:ZZ
+     Outputs
+          :QQ
+     Description	  
+       Text
+	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
+	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$ 
+	   and $\frac{\alpha(I)}{waldschmidt(I)}$. 
+       Example 
+	   T = QQ[x,y,z];
+	   I = intersect(ideal"x,y",ideal"x,z",ideal"y,z");
+	   lowerBoundResurgence(I,5,UseWaldschmidt=>true)
+
+///
+
+
 
 doc ///
      Key 
@@ -1414,9 +1440,20 @@ doc ///
 ///
 
 
+
 doc ///
      Key 
          SampleSize
+     Headline 
+         optional parameter used for approximating asymptotic invariants that are defined as limits.
+     SeeAlso
+     	 waldschmidt
+	 asymptoticRegularity    
+///	   
+
+doc ///
+     Key 
+         [waldschmidt,SampleSize]
      Headline 
          optional parameter used for approximating asymptotic invariants that are defined as limits.
      Usage 
@@ -1434,12 +1471,39 @@ doc ///
 	   waldschmidt(J, SampleSize=>5)
 ///	   
 
+doc ///
+     Key 
+         [asymptoticRegularity,SampleSize]
+     Headline 
+         optional parameter used for approximating asymptotic invariants that are defined as limits.
+     Usage 
+         asymptoticRegularity(I,SampleSize=>ZZ)
+     Description	  
+         Text
+       	   We give an approximation of the asymptotic regularity by taking the minimum value of $\frac{reg(I^{(n)})}{n}$
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize;
+	   the default value for SampleSize is 10. 
+     
+         Example
+           R = QQ[x,y,z];
+	   J = ideal (x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
+	   asymptoticRegularity(J, SampleSize=>5)
+///	   
+
 
 doc ///
      Key 
          InSymbolic
---       	 [containmentProblem,InSymbolic]
---       	 [(containmentProblem, Ideal, ZZ),InSymbolic]
+     Headline 
+         an optional parameter used in containmentProblem.
+     SeeAlso
+     	 containmentProblem
+
+///	   
+
+doc ///
+     Key 
+       	 [containmentProblem,InSymbolic]
      Headline 
          an optional parameter used in containmentProblem.
      Usage 
@@ -1465,8 +1529,8 @@ doc ///
      Description
          Text	  
        	   We give an approximation of the asymptotic regularity by taking the minimum value of $\frac{reg(I^{(n)})}{n}$
-	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter SampleSize;
-	    the default value for SampleSize is 10. 
+	   over a finite number of exponents $n$, namely for $n$ from 1 to the optional parameter @TO SampleSize@;
+	    the default value for @TO SampleSize@ is 10. 
      
          Example
            R = QQ[x,y,z];
@@ -1494,6 +1558,8 @@ doc ///
          I = ideal(x*y,x*z,y*z);					      
 	 symbolicDefect(I,2)
  ///
+
+
 
 
 TEST ///
