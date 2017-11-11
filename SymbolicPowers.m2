@@ -863,7 +863,7 @@ doc ///
        isSymbPowerContainedinPower
        (isSymbPowerContainedinPower, Ideal, ZZ, ZZ)
    Headline
-       Tests if the m-th symbolic power an ideal is contained the n-th in a power
+       tests if the m-th symbolic power an ideal is contained the n-th power
    Usage
        isSymbPowerContainedinPower(I,m,n)
    Inputs
@@ -872,7 +872,7 @@ doc ///
     	n:ZZ
    Outputs
        :Boolean
-           whether the m-th symbolic power of 'I' is contained in the n-th power
+           whether the m-th symbolic power of $I$ is contained in the n-th power
    Description
        Example
            R = QQ[x,y,z]
@@ -888,7 +888,7 @@ doc ///
        containmentProblem
        (containmentProblem, Ideal, ZZ)
    Headline
-       Given an ideal I and an integer n, returns the order of the smallest symbolic power of I contained in I^n.
+       computes the smallest symbolic power contained in a power of an ideal.
    Usage
        containmentProblem(I,n)
    Inputs
@@ -898,6 +898,7 @@ doc ///
        :ZZ
            the minimum value m such that the m-th symbolic power of I is contained in I^n
    Description
+       Given an ideal $I$ and an integer $n$, containementProblem returns the order of the smallest symbolic power of $I$ contained in $I^n$.
        Example
 	   B = QQ[x,y,z];
 	   f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -915,7 +916,7 @@ doc ///
        symbPowerPrimePosChar
        (symbPowerPrimePosChar, Ideal, ZZ)
    Headline
-       Given an ideal I in a polynomial ring over a field of positive characteristic, and an integer n, returns the n-th symbolic power of I contained.
+       
    Usage
        	symbPowerPrimePosChar(I,n)
    Inputs
@@ -926,12 +927,16 @@ doc ///
            the n-th symbolic power of I
    Description
        Text  
-           To compute $I^{(a)}$, find the largest value k with $q = p^k \leq a$. Then $I^{(a)} = (I^{[q]} : I^{a-q+1})$.
+           Given a prime ideal $I$ in a polynomial ring over a field of positive characteristic, and an integer $n$, 
+	   this method returns the $n$-th symbolic power of $I$.  To compute $I^{(a)}$, find the largest value k with 
+	   $q = p^k \leq a$. Then $I^{(a)} = (I^{[q]} : I^{a-q+1})$.
        Example 
            B = ZZ/7[x,y,z];
 	   f = map(ZZ/7[t],B,{t^3,t^4,t^5})
 	   I = ker f;
 	   symbPowerPrimePosChar(I,2)
+   Caveat
+       The ideal must be prime.
    SeeAlso
        symbolicPower
 ///
@@ -943,10 +948,10 @@ doc ///
        symbolicPower
        (symbolicPower, Ideal, ZZ)
    Headline
-       Given an ideal I and an integer n, returns the n-th symbolic power of I.
+       computes the symbolic power of an ideal.
    Description
        Text
-              Various algorithms are used, in the following order:     
+              Given an ideal $I$ and an integer $n$, this method returns the $n$-th symbolic power of $I$. Various algorithms are used, in the following order:     
 	      
 	      1. If $I$ is a homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I$; 
 	      
@@ -993,7 +998,8 @@ doc ///
            the truth value of $I^n==I^{(n)}$
    Description
        Text
-           Given a radical ideal I and an integer $n$, returns true if and only if $I^n=I^{(n)}$. This method circumvents computing the symbolic powers in most cases, by first testing the big height of $I^n$
+           Given a radical ideal I and an integer $n$, this method returns true if and only if $I^n=I^{(n)}$. 
+	   This method circumvents computing the symbolic powers in most cases, by first testing the big height of $I^n$
        Example
               B = QQ[x,y,z];
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -1018,10 +1024,10 @@ doc ///
 	J:Ideal
    Outputs
        :Ideal
- --          the join of I and J
+       	   the join of I and J
    Description
        Text    
-           See Seth Sullivant's "Combinatorial symbolic powers", J. Algebra 319 (2008), no. 1, 115--142, for a definition.
+           This method uses Seth Sullivant's results found in "Combinatorial symbolic powers", J. Algebra 319 (2008), no. 1, 115-142.
        Example
            S = QQ[x,y,z];
 	   I = ideal(x^3,x^2*y^2,x*z^3,y^4,y^2*z);
@@ -1034,7 +1040,7 @@ doc ///
          symbolicPowerJoin
 	 (symbolicPowerJoin,Ideal,ZZ)
      Headline 
-         Symbolic powers of prime ideals using Sullivant's algorithm.
+         computes the symbolic power of the prime ideal using join of ideals.
      Usage 
          symbolicPowerJoin(P,n)
      Inputs 
@@ -1042,12 +1048,12 @@ doc ///
 	  n:ZZ
      Outputs
           :Ideal
---  the n-th symbolic power of P
+	      the n-th symbolic power of P
      Description	  
        Text
-	   Computes the n-th symbolic power of the prime ideal P, using join of ideals.
+	   Computes the $n$-th symbolic power of the prime ideal $P$, using join of ideals.
 	   
-	   This is the algorithm in Seth Sullivant's "Combinatorial symbolic powers", J. Algebra 319 (2008), no. 1, 115--142.
+	   This is the algorithm in Seth Sullivant's "Combinatorial symbolic powers", J. Algebra 319 (2008), no. 1, 115-142.
        Example 
 	   A = QQ[x,y,z];
 	   symbolicPowerJoin(ideal(x,y),2) 
@@ -1064,7 +1070,7 @@ doc ///
 	 (symbolicContainmentMonomialCurve,List,ZZ,ZZ)
 	 (symbolicContainmentMonomialCurve,Ring,List,ZZ,ZZ)
      Headline 
-         Tests the containment of symbolic in ordinary powers of ideals for monomial curves.
+         tests the containment of symbolic in ordinary powers of ideals for monomial curves.
      Usage 
          symbolicContainmentMonomialCurve(L,m,n)
 	 symbolicContainmentMonomialCurve(k,L,m,n)
@@ -1077,7 +1083,8 @@ doc ///
           :Boolean
      Description	  
        Text
-	   Tests whether $I^{(m)} \subseteq I^n$, where $I$ is the defining ideal for the monomial curve defined by $t^{a_1}, \ldots, t^{a_n}$. If no field is provided, the ideal is defined over $\mathbb{Q}$.
+	   Tests whether $I^{(m)} \subseteq I^n$, where $I$ is the defining ideal for the monomial curve defined by $t^{a_1}, \ldots, t^{a_n}$. 
+	   If no field is provided, the ideal is defined over $\mathbb{Q}$.
        Example 
 	   symbolicContainmentMonomialCurve({3,4,5},3,2) 
      SeeAlso 
@@ -1093,7 +1100,7 @@ doc ///
 	 (symbolicPowerMonomialCurve,List,ZZ)
 	 (symbolicPowerMonomialCurve,Ring,List,ZZ)
      Headline 
-         Computes the symbolic powers of ideals defining monomial curves.
+         computes the symbolic powers of ideals defining monomial curves.
      Usage 
          symbolicPowerMonomialCurve(L,m)
 	 symbolicPowerMonomialCurve(k,L,m)
@@ -1105,7 +1112,8 @@ doc ///
           :Ideal
      Description	  
        Text
-	   Finds the m-th symbolic power of I, where I is the defining ideal for the monomial curve defined by $t^{a_1}, \ldots, t^{a_n}$. If no field is provided, the ideal is defined over $\mathbb{Q}$.
+	   Finds the $m$-th symbolic power of $I$, where $I$ is the defining ideal for the monomial curve defined 
+	   by $t^{a_1}, \ldots, t^{a_n}$. If no field is provided, the ideal is defined over $\mathbb{Q}$.
        Example 
 	   symbolicPowerMonomialCurve({3,4,5},3) 
      SeeAlso 
@@ -1120,7 +1128,7 @@ doc ///
          squarefreeGens
 	 (squarefreeGens,Ideal)
      Headline 
-         Returns all square-free monomials in a minimal generating set of the given ideal.
+         returns all square-free monomials in a minimal generating set of the given ideal.
      Usage 
          squarefreeGens(I)
      Inputs 
@@ -1129,7 +1137,7 @@ doc ///
           :List
      Description	  
        Text
-	   Given a monomial ideal I, returns all square-free monomials in a minimal generating set of I.
+	   Given a monomial ideal $I$, returns all square-free monomials in a minimal generating set of $I$.
        Example 
 	   R = QQ[x,y,z];
 	   I = ideal(x*y,y*z,x^2);
@@ -1143,7 +1151,7 @@ doc ///
          squarefreeInCodim
 	 (squarefreeInCodim,Ideal)
      Headline 
-         Finds square-fee monomials in I^c, where c is the codimension of the given ideal.
+         finds square-fee monomials in ideal raised to the power of the codimension.
      Usage 
          squarefreeInCodim(I)
      Inputs 
@@ -1152,7 +1160,7 @@ doc ///
           :List
      Description	  
        Text
-	   Given a monomial ideal I, returns all square-free monomials in a minimal generating set of I^c.
+	   Given a monomial ideal $I$, returns all square-free monomials in a minimal generating set of $I^c$ where $c$ is the codimension of $I$.
        Example 
 	   R = QQ[x,y,z];
 	   I = ideal(x*y,y*z,x*z);
@@ -1168,7 +1176,7 @@ doc ///
          isKonig
 	 (isKonig,Ideal)
      Headline 
-         Determines if a given square-free ideal is Konig.
+         determines if a given square-free ideal is Konig.
      Usage 
          isKonig(I)
      Inputs 
@@ -1177,9 +1185,8 @@ doc ///
           :Boolean
      Description	  
        Text
-	   Given a square-free monomial ideal I, determines if the ideal is Konig.
-       Text
-	   A square-free monomial ideal I of codimension c is Konig if it contains a regular sequence of monomials of length c.
+	   Given a square-free monomial ideal $I$, determines if the ideal is Konig. 
+	   A square-free monomial ideal $I$ of codimension $c$ is Konig if it contains a regular sequence of monomials of length $c$.
        Example 
 	   R = QQ[x,y,z];
 	   I = ideal(x*y,y*z,x*z);
