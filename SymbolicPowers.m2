@@ -1200,7 +1200,7 @@ doc ///
          isPacked
 	 (isPacked,Ideal)
      Headline 
-         Determines if a given square-free ideal is packed.
+         determines if a given square-free ideal is packed.
      Usage 
          isPacked(I)
      Inputs 
@@ -1209,9 +1209,8 @@ doc ///
           :Boolean
      Description	  
        Text
-	   Given a square-free monomial ideal I, determines if the ideal is Konig.
-       Text
-	   A square-free monomial ideal I of codimension c is packed if every ideal obtained from it by replacing any number of variables by 1 or 0 is Konig.
+	   Given a square-free monomial ideal $I$, determines if the ideal is Konig.
+	   A square-free monomial ideal $I$ of codimension $c$ is packed if every ideal obtained from it by replacing any number of variables by 1 or 0 is Konig.
        Example 
 	   R = QQ[x,y,z];
 	   I = ideal(x*y,y*z,x*z);
@@ -1226,7 +1225,7 @@ doc ///
          noPackedSub
 	 (noPackedSub,Ideal)
      Headline 
-         Finds a substitution of variables by 1 and/or 0 for which I is not Konig.
+         finds a substitution of variables by 1 and/or 0 for which an ideal is not Konig.
      Usage 
          noPackedSub(I)
      Inputs 
@@ -1236,7 +1235,6 @@ doc ///
      Description	  
        Text
 	   Given an ideal that is not packed, returns a substitution of variables by 0 and/or 1 that produces an ideal that is not Konig.
-       Text
 	   Determines only one such substitutions, even though others may exist.
        Example 
 	   R = QQ[x,y,z];
@@ -1252,7 +1250,7 @@ doc ///
          noPackedAllSubs
 	 (noPackedAllSubs,Ideal)
      Headline 
-         Finds all substitutions of variables by 1 and/or 0 for which I is not Konig.
+         finds all substitutions of variables by 1 and/or 0 for which ideal is not Konig.
      Usage 
          noPackedAllSubs(I)
      Inputs 
@@ -1276,7 +1274,7 @@ doc ///
          minDegreeSymbPower
 	 (minDegreeSymbPower,Ideal,ZZ)
      Headline 
-         Returns the minimal degree of a given symbolic power of an ideal.
+         returns the minimal degree of a given symbolic power of an ideal.
      Usage 
          minDegreeSymbPower(Ideal,ZZ)
      Inputs 
@@ -1299,7 +1297,7 @@ doc ///
          lowerBoundResurgence
 	 (lowerBoundResurgence,Ideal,ZZ)
      Headline 
-         Computes a lower bound for the resurgence of a given ideal
+         computes a lower bound for the resurgence of a given ideal.
      Usage 
          lowerBoundResurgence(Ideal,ZZ)
      Inputs 
@@ -1309,7 +1307,7 @@ doc ///
           :QQ
      Description	  
        Text
-	   Given an ideal $I$ and an integer $n$, finds the maximum of the quotiens m/k that fail $I^{(m)} \subseteq I^k$ with $k \leq n$.
+	   Given an ideal $I$ and an integer $n$, finds the maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$.
        Example 
 	   T = QQ[x,y,z];
 	   I = intersect(ideal"x,y",ideal"x,z",ideal"y,z");
@@ -1321,7 +1319,7 @@ doc ///
      Key 
          UseWaldschmidt
      Headline 
-         Optional input for computing a lower bound for the resurgence of a given ideal
+         optional input for computing a lower bound for the resurgence of a given ideal.
      Usage 
          lowerBoundResurgence(Ideal,ZZ,UseWaldschmidt=>true)
      Inputs 
@@ -1349,7 +1347,7 @@ doc ///
 	 (symbolicPolyhedron,Ideal)
 	 (symbolicPolyhedron,MonomialIdeal)
      Headline 
-         Computes the symbolic polyhedron for a monomial ideal. 
+         computes the symbolic polyhedron for a monomial ideal. 
      Usage 
          symbolicPolyhedron(I)
      Inputs 
@@ -1358,9 +1356,9 @@ doc ///
           :Polyhedron 
      Description	  
        Text
-	   The symbolic polyhedron associated to a monomial ideal I is defined in the paper "Symbolic Powers of Monomial Ideals" 
+	   The symbolic polyhedron associated to a monomial ideal $I$ is defined in the paper "Symbolic Powers of Monomial Ideals" 
 	   by S. M. Cooper, R. J. D. Embree, H. T. Ha, A. H. Hoefel. The symbolic polyhedron contains the exponent vector of any
-	   monomial in I^n scaled by 1/n.
+	   monomial in $I^n$ scaled by $1/n$.
 	  
        Text
        	   This function uses the Polyhedra package and returns an object of type Polyhedron.
@@ -1380,7 +1378,7 @@ doc ///
 	 (waldschmidt,Ideal)
 	 (waldschmidt,MonomialIdeal)
      Headline 
-         Computes the Waldschmidt constant  for a homogeneous ideal. 
+         computes the Waldschmidt constant for a homogeneous ideal. 
      Usage 
          waldschmidt(I)
      Inputs 
@@ -1420,7 +1418,7 @@ doc ///
      Key 
          SampleSize
      Headline 
-         An optional parameter used for approximating asymptotic invariants that are defined as limits.
+         optional parameter used for approximating asymptotic invariants that are defined as limits.
      Usage 
          waldschmidt(I,SampleSize=>ZZ)
      Description	  
@@ -1440,8 +1438,10 @@ doc ///
 doc ///
      Key 
          InSymbolic
+--       	 [containmentProblem,InSymbolic]
+--       	 [(containmentProblem, Ideal, ZZ),InSymbolic]
      Headline 
-         An optional parameter used in containmentProblem
+         an optional parameter used in containmentProblem.
      Usage 
          containmentProblem(I,n,InSymbolic => true)
      Description	  
