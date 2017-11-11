@@ -349,17 +349,6 @@ symbolicPowerMonomialCurve(Ring,List,ZZ) := Ideal => (k,L,m) -> (
 --Given a monomial ideal, finds a minimal generating set, 
 --and then returns the exponents of the monomials in that set
 --Given a monomial, returns the exponents
-{*
-exponentsMonomialGens = method(TypicalValue => List)
-exponentsMonomialGens(RingElement) := List => r -> (
-    R := ring r;
-    k := coefficientRing R;
-    d := dim R;
-    deg := table(d,d,(i,j) -> if i==j then 1 else 0);
-    S := k[toSequence flatten entries vars R,Degrees=>deg];
-    f := map(S,R,flatten entries vars S);
-    degree(f(r)))
-*}
 
 exponentsMonomialGens = method(TypicalValue => List)
 exponentsMonomialGens(Ideal) := List => I -> (
@@ -367,24 +356,6 @@ exponentsMonomialGens(Ideal) := List => I -> (
     L = flatten entries mingens I;
     apply(L, l -> flatten exponents l)    
     )
-
-{*        
-    R := ring I;
-    k := coefficientRing R;
-    d := dim R;
-    deg := table(d,d,(i,j) -> if i==j then 1 else 0);
-    S := k[toSequence flatten entries vars R,Degrees=>deg];
-    f := map(S,R,flatten entries vars S);
-    m := flatten entries(mingens f(I));
-    delete({},apply(m,degree)))
-*}
-
-{* Not using this.
-squarefreeGensList = method()
-squarefreeGensList(Ideal) := List => I ->(
-    w := exponentsMonomialGens(I);
-    select(w,i -> all(i,o -> o<2)))
-*}
 
 squarefreeGens = method()
 squarefreeGens(Ideal) := List => I ->(
