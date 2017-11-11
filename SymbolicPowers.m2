@@ -258,14 +258,6 @@ containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 
 
 
---Given integers a and p, finds the largest power of p such that p^k<=a
-powersdivision = method(TypicalValue => ZZ)
-powersdivision(ZZ,ZZ,ZZ) := ZZ => (a,p,k) -> (if p^k>a then 1 else 
-    1+(powersdivision(a,p,k+1)))
-powersdivision(ZZ,ZZ) := ZZ => (a,p) -> powersdivision(a,p,1)
-
-
-
 
 
 -----------------------------------------------------------
@@ -277,6 +269,13 @@ powersdivision(ZZ,ZZ) := ZZ => (a,p) -> powersdivision(a,p,1)
 -----------------------------------------------------------
 
 
+
+--Given integers a and p, finds the largest power of p such that p^k<=a
+--auxiliary for symbPowerPrimePosChar
+powersdivision = method(TypicalValue => ZZ)
+powersdivision(ZZ,ZZ,ZZ) := ZZ => (a,p,k) -> (if p^k>a then 1 else 
+    1+(powersdivision(a,p,k+1)))
+powersdivision(ZZ,ZZ) := ZZ => (a,p) -> powersdivision(a,p,1)
 
 
 --Computes the symbolic power of a prime ideal in characteristic p
