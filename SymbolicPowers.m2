@@ -903,52 +903,8 @@ doc ///
        isSymbPowerContainedinPower
 ///
 
---To delete and include in containmentProblem
-///
-   Key
-       containmentProblemGivenSymbolicPower
-       (containmentProblemGivenSymbolicPower, Ideal, ZZ)
-   Headline
-       Given an ideal I and an integer n, returns the order of the largest power of I containing in I^{(n)}.
-   Usage
-       containmentProblemGivenSymbolicPower(I,m)
-   Inputs
-	I:Ideal
-	m:ZZ
-   Outputs
-       :ZZ
-           the largest value n such that I^n contains the m-th symbolic power of I.
-   Description
-       Example
-	   B = QQ[x,y,z];
-	   f = map(QQ[t],B,{t^3,t^4,t^5})
-	   I = ker f;
-	   containmentProblemGivenSymbolicPower(I,3)
-   SeeAlso
-       containmentProblem
-///
 
-doc ///
-   Key
-       frobeniusPower
-       (frobeniusPower, Ideal, ZZ)
-   Headline
-       Given an ideal I in characteristic p and q=p^e, returns the q-th Frobenius power of I.
-   Usage
-       frobeniusPower(I,q)
-   Inputs
-	I:Ideal
-	q:ZZ
-   Outputs
-       :Ideal
-           the q-th Frobenius power of I
-   Description
-       Example
-	   B = ZZ/7[x,y,z];
-	   f = map(ZZ/7[t],B,{t^3,t^4,t^5})
-	   I = ker f;
-	   frobeniusPower(I,7)
-///
+
 
 doc ///
    Key
