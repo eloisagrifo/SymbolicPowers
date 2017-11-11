@@ -284,7 +284,7 @@ symbPowerPrimePosChar(Ideal,ZZ) := Ideal => (I,n) -> (R := ring I; p := char R;
     then "Not a prime ideal" else (
 	h := codim I;
 	if p==0 then "The characteristic must be positive" else
-	(e := powersdivision(n,p); q := p^e; c := q-1; d := h*c-n+1; J:= fastPower(I,d);
+	(e := powersdivision(n,p); q := p^e; c := q-1; d := h*c-n+1; J:= I^d; --fastPower(I,d);
 	    (frobeniusPower(I,q)):J)))
 
 
@@ -305,7 +305,7 @@ joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (R := ring I; k := coefficientRing(
     
 symbolicPowerJoin = method(TypicalValue => Ideal);
 symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (m := ideal(generators ring p);
-    joinIdeals(p,fastPower(m,n)))
+    joinIdeals(p,m^n))--fastPower(m,n)))
 
 
 
