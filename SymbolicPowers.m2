@@ -22,7 +22,6 @@ export {
     "assPrimesHeight",
     "bigHeight",
     "containmentProblem",     
-    "frobeniusPower",
     "joinIdeals",    
     "isKonig", 
     "isPacked",
@@ -1723,11 +1722,11 @@ assert(containmentProblem(I,2)==4)
 ///
 
 --frobeniusPower
-TEST ///
-R=ZZ/3[x,y]
-I=ideal(x*y^2+1,x^2)
-assert(frobeniusPower(I,9)==ideal(x^9*y^(19)+1,x^(18)))
-///
+--TEST ///
+--R=ZZ/3[x,y]
+--I=ideal(x*y^2+1,x^2)
+--assert(frobeniusPower(I,9)==ideal(x^9*y^(19)+1,x^(18)))
+--///
 
 --lowerBoundResurgence
 TEST ///
@@ -1821,9 +1820,10 @@ assert(I==ideal(R_0^2-2*R_0*R_2+R_2^2,R_0*R_2^2-R_2^3-R_0*R_1+R_1*R_2,R_2^4-2*R_
 
 -- symbolicPolyhedron
 TEST ///
+ needsPackage"Polyhedra"
  R = QQ[x,y,z];
  I = ideal(x*y,y*z,x*z);
- -- assert((vertices symbolicPolyhedron I)== matrix{{1,1,0,1/2},{1,0,1,1/2},{0,1,1,1/2}})
+ assert((vertices symbolicPolyhedron I)== matrix{{1,1,0,1/2},{1,0,1,1/2},{0,1,1,1/2}})
 ///
 
 -- waldschmidt
@@ -1896,4 +1896,5 @@ uninstallPackage"SymbolicPowers"
 restart
 installPackage"SymbolicPowers"
 viewHelp"SymbolicPowers"
+check"SymbolicPowers"
 
