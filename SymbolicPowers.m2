@@ -1008,6 +1008,15 @@ doc ///
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
 	      I = ker f;
 	      symbolicPower(I,2)
+   Caveat
+       When computing symbolic powers of a quasi-homogeneous ideal, the method runs faster if the ideal is homegeneous.
+       Example
+       	   P = ker map(QQ[t],QQ[x,y,z],{t^3,t^4,t^5})
+	   isHomogeneous P
+	   time symbolicPower(P,4);
+	   Q = ker map(QQ[t],QQ[x,y,z, Degrees => {3,4,5}],{t^3,t^4,t^5})
+	   isHomogeneous Q
+	   time symbolicPower(Q,4);
    SeeAlso
       symbPowerPrimePosChar
 ///
