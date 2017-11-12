@@ -981,6 +981,14 @@ doc ///
        (symbolicPower, Ideal, ZZ)
    Headline
        computes the symbolic power of an ideal.
+   Usage
+       	symbolicPower(I,n)
+   Inputs
+        I:Ideal
+	n:ZZ
+   Outputs
+       :Ideal
+           the n-th symbolic power of I
    Description
        Text
               Given an ideal $I$ and an integer $n$, this method returns the $n$-th symbolic power of $I$. Various algorithms are used, in the following order:     
@@ -994,22 +1002,16 @@ doc ///
 	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$.
 	      
 	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
-   Usage
-       	symbolicPower(I,n)
-   Inputs
-        I:Ideal
-	n:ZZ
-   Outputs
-       :Ideal
-           the n-th symbolic power of I
-   Description
+	      
        Example
               B = QQ[x,y,z];
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
 	      I = ker f;
 	      symbolicPower(I,2)
-   Caveat
-       When computing symbolic powers of a quasi-homogeneous ideal, the method runs faster if the ideal is homegeneous.
+	      
+       Text
+       	   When computing symbolic powers of a quasi-homogeneous ideal, the method runs faster if the ideal is changed to be homegeneous.
+	   
        Example
        	   P = ker map(QQ[t],QQ[x,y,z],{t^3,t^4,t^5})
 	   isHomogeneous P
@@ -1017,6 +1019,7 @@ doc ///
 	   Q = ker map(QQ[t],QQ[x,y,z, Degrees => {3,4,5}],{t^3,t^4,t^5})
 	   isHomogeneous Q
 	   time symbolicPower(Q,4);
+
    SeeAlso
       symbPowerPrimePosChar
 ///
