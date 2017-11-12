@@ -1656,53 +1656,9 @@ doc ///
 doc ///
     Key
     	UseMinimalPrimes
-    Headline	 
-    	an option to only use minimal primes to calculate symbolic powers
-    Description
-    	Text
-	    The default value is false. When defined to be true, the symbolic power is calculated as defined in Villarreal. 
-	    In particular, @TO symbolicPower@ has the option to restrict to minimal primes 
-	    versus use all associated primes with @TO UseMinimalPrimes@. The 
-	    symbolic power of an ideal $I$ is defined as 
-	    $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$
-	    where $Min(R/I)$, is the set of minimal primes in $I$.
-	    
-       Text
-       	   R. Villarreal. "Monomial algebras" Second edition. Monographs and Research Notes in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5.
-
-    SeeAlso
-    	containmentProblem
-	isSymbPowerContainedinPower
-	symbolicDefect	  
-	symbolicPower
-///
-
-doc ///
-    Key
     	[symbolicPower,UseMinimalPrimes]
-    Headline	 
-    	an option to only use minimal primes to calculate symbolic powers
-    Description
-    	Text
-	    The default value is false. When defined to be true, the symbolic power is calculated as defined in Villarreal. 
-	    In particular, @TO symbolicPower@ has the option to restrict to minimal primes 
-	    versus use all associated primes with @TO UseMinimalPrimes@. The 
-	    symbolic power of an ideal $I$ is defined as 
-	    $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$
-	    where $Min(R/I)$, is the set of minimal primes in $I$.
-	    
-       Text
-       	   R. Villarreal. "Monomial algebras" Second edition. Monographs and Research Notes in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5.
-
-    SeeAlso
-    	containmentProblem
-	isSymbPowerContainedinPower
-	symbolicDefect	  
-	symbolicPower
-///
-
-doc ///
-    Key
+    	[isSymbPowerContainedinPower,UseMinimalPrimes]
+    	[symbolicDefect,UseMinimalPrimes]	
     	[containmentProblem,UseMinimalPrimes]
     Headline	 
     	an option to only use minimal primes to calculate symbolic powers
@@ -1710,7 +1666,7 @@ doc ///
     	Text
 	    The default value is false. When defined to be true, the symbolic power is calculated as defined in Villarreal. 
 	    In particular, @TO symbolicPower@ has the option to restrict to minimal primes 
-	    versus use all associated primes with @TO UseMinimalPrimes@. The 
+	    versus use all associated primes with @TO UseMinimalPrimes@. With this option the
 	    symbolic power of an ideal $I$ is defined as 
 	    $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$
 	    where $Min(R/I)$, is the set of minimal primes in $I$.
@@ -1725,56 +1681,7 @@ doc ///
 	symbolicPower
 ///
 
-doc ///
-    Key
-    	[isSymbPowerContainedinPower,UseMinimalPrimes]
-    Headline	 
-    	an option to only use minimal primes to calculate symbolic powers
-    Description
-    	Text
-	    The default value is false. When defined to be true, the symbolic power is calculated as defined in Villarreal. 
-	    In particular, @TO symbolicPower@ has the option to restrict to minimal primes 
-	    versus use all associated primes with @TO UseMinimalPrimes@. The 
-	    symbolic power of an ideal $I$ is defined as 
-	    $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$
-	    where $Min(R/I)$, is the set of minimal primes in $I$.
-	    
-       Text
-       	   R. Villarreal. "Monomial algebras" Second edition. Monographs and Research Notes in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5.
-
-    SeeAlso
-    	containmentProblem
-	isSymbPowerContainedinPower
-	symbolicDefect	  
-	symbolicPower
-///
-
-doc ///
-    Key
-    	[symbolicDefect,UseMinimalPrimes]
-    Headline	 
-    	an option to only use minimal primes to calculate symbolic powers
-    Description
-    	Text
-	    The default value is false. When defined to be true, the symbolic power is calculated as defined in Villarreal. 
-	    In particular, @TO symbolicPower@ has the option to restrict to minimal primes 
-	    versus use all associated primes with @TO UseMinimalPrimes@. The 
-	    symbolic power of an ideal $I$ is defined as 
-	    $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$
-	    where $Min(R/I)$, is the set of minimal primes in $I$.
-	    
-       Text
-       	   R. Villarreal. "Monomial algebras" Second edition. Monographs and Research Notes in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5.
-
-    SeeAlso
-    	containmentProblem
-	isSymbPowerContainedinPower
-	symbolicDefect	  
-	symbolicPower
-///
-
-
-
+-- tests
 
 TEST ///
    S = QQ[x,y,z];
