@@ -580,8 +580,10 @@ document {
      
      UL {
 	 "Ben Drabkin",
+	 "Andrew Conner",
 	 "Alexandra Seceleanu",
-	 "Branden Stone"
+	 "Branden Stone",
+	 "Diana Zhong"
 	},
 
    SUBSECTION "A Quick Introduction",
@@ -1967,7 +1969,6 @@ viewHelp"SymbolicPowers"
 check"SymbolicPowers"
 
 restart
-
 -- Paper Example Ideal of height dim R-1
 loadPackage "SymbolicPowers";
 R=QQ[x,y,z];
@@ -1981,7 +1982,6 @@ loadPackage "SymbolicPowers";
 R=QQ[w,x,y,z]/(x*y-z^2);
 I=ideal(x,z);
 symbolicPower(I,2)
-
 
 restart
 -- Paper Example Monomial Ideal
