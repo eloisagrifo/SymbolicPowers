@@ -550,9 +550,9 @@ document {
   Headline => "A package for computing symbolic powers of ideals",
    
    PARA {
-       "This package gives the ability to compute symbolic powers, and related invarients,
+       "This package gives the ability to compute symbolic powers, and related invariants,
        of ideals in a polynomial ring or a quotient of a polynomial ring. For example, 
-       in the context of the default behavoir, ", TO "symbolicPower", " assumes the 
+       in the context of the default behavior, ", TO "symbolicPower", " assumes the 
        following definition of the symbolic power of an ideal ", TEX /// I ///, ",", 
        TEX /// $$I^{(n)} = \cap_{p \in Ass(R/I)}(I^nR_p \cap R ),$$ ///,
        "as defined by M. Hochster and C. Huneke."},
@@ -1976,7 +1976,7 @@ I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
 symbolicPower(I,3);
 symbolicPower(I,3)==saturate(I^3)
 
--- Paper Exampe Primary ideals
+-- Paper Example Primary ideals
 restart
 loadPackage "SymbolicPowers";
 R=QQ[w,x,y,z]/(x*y-z^2);
@@ -2006,7 +2006,7 @@ symbolicPolyhedron(I)
 waldschmidt I
 
 restart
--- Paper Example Waldschmidt constants of abitrary ideals
+-- Paper Example Waldschmidt constants of arbitrary ideals
 loadPackage "SymbolicPowers";
 R=QQ[x,y,z];
 I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
