@@ -497,6 +497,9 @@ return N
 alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0) 
 
 -- Computes the Waldschmidt constant for a given ideal
+-- Input: an ideal or a  monomial ideal 
+-- Output: a rational number
+
 waldschmidt = method(Options=>{SampleSize=>10});
 waldschmidt Ideal := opts -> I -> (
 if isMonomial I then ( 
@@ -515,9 +518,9 @@ waldschmidt MonomialIdeal := opts -> I -> (
     return min apply (entries transpose vertices N, a-> sum  a)
     )
 
-lowerBoundResurgence = method(TypicalValue => QQ, Options =>{UseWaldschmidt=>false})
-lowerBoundResurgence(Ideal, ZZ) := opts  -> (I,m) -> (
-    l := max append(apply(toList(2 .. m),o -> (containmentProblem(I,o)-1)/o),1);
+lowerBoundResurgence = method(TypicalValue => QQ, Options =>{SampleSize=>5,UseWaldschmidt=>false})
+lowerBoundResurgence(Ideal) := opts  -> (I) -> (
+    l := max append(apply(toList(2 .. opts#SampleSize),o -> (containmentProblem(I,o)-1)/o),1);
     if opts#UseWaldschmidt == false then return l
     else return max {l, alpha(I)/waldschmidt(I)}
     )
@@ -1385,24 +1388,23 @@ doc ///
 doc ///
      Key 
          lowerBoundResurgence
-	 (lowerBoundResurgence,Ideal,ZZ)
+	 (lowerBoundResurgence,Ideal)
      Headline 
          computes a lower bound for the resurgence of a given ideal.
      Usage 
-         lowerBoundResurgence(Ideal,ZZ)
+         lowerBoundResurgence(Ideal)
      Inputs 
      	  I:Ideal
-	  n:ZZ
      Outputs
           :QQ
      Description	  
        Text
-	   Given an ideal $I$ and an integer $n$, finds the maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$.
+	   Given an ideal $I$, finds the maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ the optional input SampleSize.
 
        Example 
 	   T = QQ[x,y,z];
 	   I = intersect(ideal"x,y",ideal"x,z",ideal"y,z");
-	   lowerBoundResurgence(I,5)
+	   lowerBoundResurgence(I)
 
 ///
 
@@ -1412,10 +1414,9 @@ doc ///
      Headline 
          optional input for computing a lower bound for the resurgence of a given ideal.
      Usage 
-         lowerBoundResurgence(Ideal,ZZ,UseWaldschmidt=>true)
+         lowerBoundResurgence(Ideal,UseWaldschmidt=>true)
      Inputs 
      	  I:Ideal
-	  n:ZZ
      Outputs
           :QQ
      Description	  
@@ -1427,8 +1428,28 @@ doc ///
        Example 
 	   T = QQ[x,y,z];
 	   I = intersect(ideal"x,y",ideal"x,z",ideal"y,z");
-	   lowerBoundResurgence(I,5,UseWaldschmidt=>true)
+	   lowerBoundResurgence(I,UseWaldschmidt=>true)
 
+///
+
+
+doc ///
+     Key 
+         [lowerBoundResurgence,SampleSize]
+     Headline 
+         optional parameter used for approximating asymptotic invariants that are defined as limits.
+     Usage 
+         lowerBoundResurgence(I,SampleSize=>ZZ)
+     Description	  
+         Text
+       	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
+	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@
+	   and $\frac{\alpha(I)}{waldschmidt(I)}$.
+     
+         Example
+           R = QQ[x,y,z];
+	   J = ideal (x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
+	   lowerBoundResurgence(J, SampleSize=>5)
 ///
 
 
@@ -1438,22 +1459,21 @@ doc ///
      Headline 
          optional input for computing a lower bound for the resurgence of a given ideal.
      Usage 
-         lowerBoundResurgence(Ideal,ZZ,UseWaldschmidt=>true)
+         lowerBoundResurgence(Ideal,UseWaldschmidt=>true)
      Inputs 
      	  I:Ideal
-	  n:ZZ
      Outputs
           :QQ
      Description	  
        Text
 	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
-	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$ 
+	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@ 
 	   and $\frac{\alpha(I)}{waldschmidt(I)}$. 
 
        Example 
 	   T = QQ[x,y,z];
 	   I = intersect(ideal"x,y",ideal"x,z",ideal"y,z");
-	   lowerBoundResurgence(I,5,UseWaldschmidt=>true)
+	   lowerBoundResurgence(I,UseWaldschmidt=>true)
 
 ///
 
@@ -1540,6 +1560,7 @@ doc ///
          optional parameter used for approximating asymptotic invariants that are defined as limits.
      SeeAlso
      	 waldschmidt
+	 lowerBoundResurgence
 	 asymptoticRegularity    
 ///	   
 
