@@ -16,6 +16,7 @@ export {
     "SampleSize",
     "UseMinimalPrimes",
     "UseWaldschmidt", 
+    "UseMonomial",
     
     -- Methods
     "asymptoticRegularity",
@@ -157,19 +158,19 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
     intersect apply(Q,i -> fastPower(i,n)))))
 
 symbPowerPrime = method()
-symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (if not(isPrime(I)) 
-    then "Not a prime ideal" else (primaryList := primaryDecomposition(fastPower(I,n)); 
+symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (
+        primaryList := primaryDecomposition(fastPower(I,n)); 
 	local result;
 	scan(primaryList, i -> if radical(i)==I then (result = i; break));
-	result))
+	result)
     
 symbPowerPrimary = method()
-symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (if not(isPrimary(I)) 
-    then "Not a primary ideal" else (rad := radical(I);
+symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (
+        rad := radical(I);
 	local result;
 	primaryList := primaryDecomposition(fastPower(I,n)); 
 	scan(primaryList,i->(if radical(i)==rad then result := i; break));
-	result))
+	result)
     
 symbPowerSat = method(TypicalValue => Ideal)
 symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (R := ring I; 
@@ -184,9 +185,11 @@ symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (assI := associatedPrimes(I);
     intersect select(decomp, a -> any(assI, i -> radical a==i)))
 
 
-symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false})
+symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false, UseMonomial => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
-
+    
+    if opts.UseMonomial then return (symbPowerMon(I,n));
+    
     if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
         
     if not opts.UseMinimalPrimes then (    
@@ -1823,7 +1826,7 @@ assert(containmentProblem(I,2)==4)
 TEST ///
 R=QQ[x,y,z]
 I=ideal(x*y,x*z,y*z)
-assert(lowerBoundResurgence(I,5)==6/5)
+assert(lowerBoundResurgence(I)==6/5)
 ///
 
 ----isSymbolicEqualOrdinary
@@ -2034,4 +2037,4 @@ I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
 waldschmidt I
 
 -- Paper Example Lower bound on resurgence
-lowerBoundResurgence(I,5)
+lowerBoundResurgence(I)
