@@ -1707,6 +1707,31 @@ doc ///
 	symbolicPower
 ///
 
+doc ///
+    Key
+    	UseMonomial
+    	[symbolicPower,UseMonomial]
+    Headline	 
+    	an option to only use monomial ideal methods to calculate symbolic powers
+    Description
+    	Text
+	    The default value is false. When defined to be true, the symbolic power is calculated 
+	    methods particular to monomial ideals. If $I$ is square-free, the symbolic powers 
+	    of $I$ are obtained by intersecting the powers of its associated primes. If $I$ is 
+	    simply monomial, one can collect the primary components in a decomposition
+	    of $I$ and intersect the powers of the maximal ones. 
+	    
+	    The ideal $I$ must be defined using @TO monomialIdeal@. 
+	    
+	Example
+	    R = ZZ/101[x,y,z]
+	    I = monomialIdeal(x*y,x*z,y*z)
+	    symbolicPower(I,5, UseMonomial => true)	   
+	   
+    SeeAlso
+	symbolicPower
+///
+
 -- tests
 
 TEST ///
