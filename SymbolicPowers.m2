@@ -573,7 +573,7 @@ document {
 	   " Invent. Math. 147 (2002), no. 2, 349–369."}, 
        {"R. Villarreal.", EM " Monomial algebras.", " Second edition. Monographs and Research Notes 
 	   in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5."}, 
-       {"Hailong Dao, Alessandro De Stefani, Eloísa Grifo, Craig Huneke, and Luis Núñez-Betancourt.", 
+       {"Hailong Dao, Alessandro De Stefani, Eloísa Grifo, Craig Huneke, and Luis Núñez-Betancourt. ", 
 	   EM "Symbolic powers of ideals", ", ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010")} 
        },
   
@@ -652,13 +652,13 @@ doc ///
          Text
               Various algorithms are used, in the following order:     
 	      
-	      1. If $I$ is a homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I$; 
+	      1. If $I$ is a saturated homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I^n$; 
 	      
-	      2. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$'
+	      2. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$;
 	      
 	      3. If $I$ is monomial ideal, but not squarefree, takes an irredundant primary decomposition of $I$ and intersects the powers of those ideals;
 	      
-	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$.
+	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
 	      
 	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
 ///
