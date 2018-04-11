@@ -184,7 +184,7 @@ symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (assI := associatedPrimes(I);
     decomp := primaryDecomposition fastPower(I,n);
     intersect select(decomp, a -> any(assI, i -> radical a==i)))
 
-
+{* Tests for Monomial Second
 symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false, UseMonomial => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     
@@ -202,6 +202,31 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 		) else (
 		    if isPrime I then return symbPowerPrime(I,n) else 
 	    	    if isPrimary I then return symbPowerPrimary(I,n) else 
+			return symbPowerSlow(I,n)
+	    	    )
+		)	    
+    )       
+    )
+*}
+
+-- Tests for Monomial First
+symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false, UseMonomial => false})
+symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
+    
+    if opts.UseMonomial then return (symbPowerMon(I,n));
+    
+    if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
+        
+    if not opts.UseMinimalPrimes then (    
+    	if (isPolynomialRing R and isMonomial I) then (
+		return symbPowerMon(monomialIdeal(I),n)
+	    ) else (
+	    if (codim I == dim R - 1 and isHomogeneous(I)) then (
+		  if depth (R/I) == 0 then return fastPower(I,n) else 
+		  return symbPowerSat(I,n) 
+		) else (
+		      if isPrime I then return symbPowerPrime(I,n) else 
+	    	      if isPrimary I then return symbPowerPrimary(I,n) else 
 			return symbPowerSlow(I,n)
 	    	    )
 		)	    
