@@ -16,7 +16,6 @@ export {
     "SampleSize",
     "UseMinimalPrimes",
     "UseWaldschmidt", 
-    "UseMonomial",
     
     -- Methods
     "asymptoticRegularity",
@@ -210,10 +209,10 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 *}
 
 -- Tests for Monomial First
-symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false, UseMonomial => false})
+symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     
-    if opts.UseMonomial then return (symbPowerMon(I,n));
+--    if opts.UseMonomial then return (symbPowerMon(I,n));
     
     if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
         
@@ -1732,6 +1731,8 @@ doc ///
 	symbolicPower
 ///
 
+{* Defunct since we change the order of the monomial tests. The symbolic powers method first considers
+   Monomial Ideals so there is no need for a monomial option. 
 doc ///
     Key
     	UseMonomial
@@ -1756,6 +1757,7 @@ doc ///
     SeeAlso
 	symbolicPower
 ///
+*}
 
 -- tests
 
