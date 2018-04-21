@@ -224,9 +224,8 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 		  if depth (R/I) == 0 then return fastPower(I,n) else 
 		  return symbPowerSat(I,n) 
 		) else (
-		      if isPrime I then return symbPowerPrime(I,n) else 
-	    	      if isPrimary I then return symbPowerPrimary(I,n) else 
-			return symbPowerSlow(I,n)
+		      if bigHeight I == codim I then return topComponents(fastPower(I,n)) 
+		      else return symbPowerSlow(I,n)
 	    	    )
 		)	    
     )       
