@@ -1,7 +1,7 @@
 newPackage(
         "SymbolicPowers",
-	Version => "1.0", 
-	Date => "November 11, 2017",
+	Version => "1.1", 
+	Date => "April 30, 2018",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@virginia.edu", HomePage => "http://people.virginia.edu/~er2eq/"}
 	    },
@@ -140,9 +140,6 @@ ideal(apply(flatten entries gens I, i -> i^q))
 
 symbPowerMon = method(TypicalValue => Ideal)
 symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
-    if not(isMonomialIdeal(I)) then "Not a monomial ideal!" else (
-	--If I is square-free, the symbolic powers of I are obtained by 
-	--intersecting the powers of its associated primes
     if isSquareFree I then 
     (assP := associatedPrimes(I); 
     intersect apply(assP, i -> fastPower(i,n)))
@@ -154,7 +151,7 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
     maxP:={};
     apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
     Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
-    intersect apply(Q,i -> fastPower(i,n)))))
+    intersect apply(Q,i -> fastPower(i,n))))
 
 symbPowerPrime = method()
 symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (
@@ -208,11 +205,10 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     )
 *}
 
--- Tests for Monomial First
+
 symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     
---    if opts.UseMonomial then return (symbPowerMon(I,n));
     
     if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
         
@@ -223,8 +219,8 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 	    if (codim I == dim R - 1 and isHomogeneous(I)) then (
 		  if depth (R/I) == 0 then return fastPower(I,n) else 
 		  return symbPowerSat(I,n) 
-		) else (
-		      if bigHeight I == codim I then return topComponents(fastPower(I,n)) 
+		) else (if (isPolynomialRing R and
+		bigHeight I == codim I) then return topComponents(fastPower(I,n)) 
 		      else return symbPowerSlow(I,n)
 	    	    )
 		)	    
