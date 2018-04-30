@@ -1646,7 +1646,7 @@ doc ///
      Description	  
          Text
        	   Given an ideal I and an integer n, @TO InSymbolic@ is used to ask the following question:
-	   What is the largest power cointained in the symbolic power $I^{(n)}$?
+	   What is the largest power containing the symbolic power $I^{(n)}$?
 
          Example
            R = QQ[x,y,z];
