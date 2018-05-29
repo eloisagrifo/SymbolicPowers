@@ -15,7 +15,8 @@ export {
     "InSymbolic",
     "SampleSize",
     "UseMinimalPrimes",
-    "UseWaldschmidt", 
+    "UseWaldschmidt",
+    "CIPrimes", 
     
     -- Methods
     "asymptoticRegularity",
@@ -206,17 +207,26 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 *}
 
 
-symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false})
+symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false,CIPrimes => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     
     
     if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
+    
+    if opts.CIPrimes then (
+	        if (Pd :=primaryDecomposition I;
+		    all(Pd,i->(dim(R)-dim(i))==#flatten(entries(mingens i)))) then (
+		    return intersect apply(Pd, i->fastPower(i,n)) 
+		    ) else (
+		     print "Associated primes are not complete intersections.")
+		);
+		    
         
     if not opts.UseMinimalPrimes then (    
     	if (isPolynomialRing R and isMonomial I) then (
 		return symbPowerMon(monomialIdeal(I),n)
 	    ) else (
-	    if (codim I == dim R - 1 and isHomogeneous(I)) then (
+	      	    if (codim I == dim R - 1 and isHomogeneous(I)) then (
 		  if depth (R/I) == 0 then return fastPower(I,n) else 
 		  return symbPowerSat(I,n) 
 		) else (if (isPolynomialRing R and
@@ -225,8 +235,8 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 	    	    )
 		)	    
     )       
-    )
-
+    
+)
 
 
 -----------------------------------------------------------
@@ -245,25 +255,25 @@ isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (Q := fastPower(P,n);
 
 
 
-isSymbPowerContainedinPower = method(TypicalValue => Boolean, Options => {UseMinimalPrimes => false})
+isSymbPowerContainedinPower = method(TypicalValue => Boolean, Options => {UseMinimalPrimes => false, CIPrimes => false})
 isSymbPowerContainedinPower(Ideal,ZZ,ZZ) := Boolean => opts -> (I,m,n) -> (
     h := bigHeight I; 
     if m<n then false else (
 	if m>= h*n then true else (
-	symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes); 
+	symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
 	pow := fastPower(I,n); 
 	isSubset(symb,pow))))
 
 
 
 
-containmentProblem = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false,InSymbolic => false})
+containmentProblem = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false,InSymbolic => false,CIPrimes => false})
 containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 
     if not(opts.InSymbolic) then (
 	m := n; 
 	while 
-	not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes)) 
+	not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes)) 
 	do m = m+1; return(m));
     
     if opts.InSymbolic then (
@@ -271,7 +281,7 @@ containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
     e := (n-n%h)/h; 
     l := lift(e,ZZ);
     while isSymbPowerContainedinPower(I,n,l+1,
-	UseMinimalPrimes => opts.UseMinimalPrimes) do l = l+1;
+	UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes) do l = l+1;
     return l))
 
 
@@ -470,13 +480,13 @@ noPackedAllSubs(Ideal) := List => I -> (var := flatten entries vars ring I; d :=
 ---Symbolic Defect
 ---------------------------------
 
-symbolicDefect = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false})
+symbolicDefect = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false,CIPrimes => false})
 symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
     R := ring I;
     Y := fastPower(I,n);
     S := R/Y;
     F := map(S,R);
-    X := symbolicPower(I,n, UseMinimalPrimes => opts.UseMinimalPrimes);
+    X := symbolicPower(I,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes);
     # flatten entries mingens F(X)
       )
 
@@ -608,7 +618,7 @@ document {
 	 "Andrew Conner",
 	 "Alexandra Seceleanu",
 	 "Branden Stone",
-	 "Diana Zhong"
+	 "Xuehua (Diana) Zhong"
 	},
 
    SUBSECTION "A Quick Introduction",
@@ -674,15 +684,17 @@ doc ///
          Text
               Various algorithms are used, in the following order:     
 	      
-	      1. If $I$ is a saturated homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I^n$; 
+	      1. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$;
 	      
-	      2. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$;
+	      2. If $I$ is monomial ideal, but not squarefree, takes an irredundant primary decomposition of $I$ and intersects the powers of those ideals;
 	      
-	      3. If $I$ is monomial ideal, but not squarefree, takes an irredundant primary decomposition of $I$ and intersects the powers of those ideals;
+	      3. If $I$ is a saturated homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I^n$;
 	      
-	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
+	      4. If $I$ is an ideal with only degree one primary components, intersects the powers of the primary components of I.
 	      
-	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
+	      5. If all the associated primes of $I$ have the same height, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
+	      
+	      6. If all else fails, compares the radicals oyf a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
 ///
 
 
@@ -1052,16 +1064,18 @@ doc ///
        Text
               Given an ideal $I$ and an integer $n$, this method returns the $n$-th symbolic power of $I$. Various algorithms are used, in the following order:     
 	      
-	      1. If $I$ is a homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I$; 
+	      1. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$;
 	      
-	      2. If $I$ is squarefree monomial ideal, intersects the powers of the associated primes of $I$'
+	      2. If $I$ is monomial ideal, but not squarefree, takes an irredundant primary decomposition of $I$ and intersects the powers of those ideals;
 	      
-	      3. If $I$ is monomial ideal, but not squarefree, takes a primary decomposition of $I$, picks the maximal elements in it, and intersects their powers;
+	      3. If $I$ is a saturated homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I^n$;
 	      
-	      4. If $I$ is prime, computes a primary decomposition of $I^n$ and intersects the components with radical $I$.
+	      4. If $I$ is an ideal with only degree one primary components, intersects the powers of the primary components of I.
 	      
-	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
+	      5. If all the associated primes of $I$ have the same height, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
 	      
+	      6. If all else fails, compares the radicals oyf a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
+ 
        Example
               B = QQ[x,y,z];
 	      f = map(QQ[t],B,{t^3,t^4,t^5})
@@ -1725,6 +1739,28 @@ doc ///
 	symbolicDefect	  
 	symbolicPower
 ///
+
+doc /// 
+    Key
+    	CIPrimes
+	[symbolicPower,CIPrimes]
+	[isSymbPowerContainedinPower,CIPrimes]
+	[symbolicDefect,CIPrimes]
+	[containmentProblem,CIPrimes]
+    Headline
+    	an option to compute the symbolic power by taking the intersection of the powers of the primary components
+    Description
+    	Text
+	    The default value is false.  When defined to be true, the @TO symbolicPower@ function tests whether each primary component is a complete intersection.  If each component is, then the function takes the intersection of the powers of the components:
+	     $$I^{(n)}=\cap_{p\in Ass(R/I)} p^n.$$
+    SeeAlso
+    	containmentProblem
+	isSymbPowerContainedinPower
+	symbolicDefect
+	symbolicPower
+///
+
+
 
 {* Defunct since we change the order of the monomial tests. The symbolic powers method first considers
    Monomial Ideals so there is no need for a monomial option. 
