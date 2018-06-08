@@ -1,7 +1,7 @@
 newPackage(
         "SymbolicPowers",
 	Version => "1.1", 
-	Date => "April 30, 2018",
+	Date => "June 8, 2018",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@virginia.edu", HomePage => "http://people.virginia.edu/~er2eq/"}
 	    },
@@ -537,7 +537,7 @@ waldschmidt Ideal := opts -> I -> (
 if isMonomial I then ( 
     print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
     N:=symbolicPolyhedron I;
-    return min apply (entries transpose vertices N, a-> sum  a)
+    return min flatten entries ((transpose vertices N) * (matrix degrees ring I) )
     )
 else (
     print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
@@ -689,12 +689,10 @@ doc ///
 	      2. If $I$ is monomial ideal, but not squarefree, takes an irredundant primary decomposition of $I$ and intersects the powers of those ideals;
 	      
 	      3. If $I$ is a saturated homogeneous ideal in a polynomial ring whose height is one less than the dimension of the ring, returns the saturation of $I^n$;
+	      	      
+	      4. If all the associated primes of $I$ have the same height, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
 	      
-	      4. If $I$ is an ideal with only degree one primary components, intersects the powers of the primary components of I.
-	      
-	      5. If all the associated primes of $I$ have the same height, computes a primary decomposition of $I^n$ and intersects the components with radical $I$;
-	      
-	      6. If all else fails, compares the radicals oyf a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
+	      5. If all else fails, compares the radicals of a primary decomposition of $I^n$ with the associated primes of $I$, and intersects the components corresponding to minimal primes.
 ///
 
 
