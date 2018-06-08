@@ -532,7 +532,7 @@ alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0)
 -- Input: an ideal or a  monomial ideal 
 -- Output: a rational number
 
-waldschmidt = method(Options=>{SampleSize=>10});
+waldschmidt = method(Options=>{SampleSize=>5});
 waldschmidt Ideal := opts -> I -> (
 if isMonomial I then ( 
     print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
@@ -1855,6 +1855,12 @@ I=ideal(x*y+x*z)
 assert(symbolicPower(I,2)==ideal((x*y+x*z)^2))
 ///
 
+TEST ///
+R=QQ[x,y,z]
+I=ideal(x*(y^5-z^5),y*(z^5-x^5),z*(x^5-y^5))
+assert(symbolicPower(I,3,CIPrimes => true)==symbolicPower(I,3))
+///
+
 --isSymbPowerContainedinPower
 TEST ///
 R=QQ[x,y];
@@ -2008,6 +2014,14 @@ TEST ///
  assert(waldschmidt(I)==3/2)
 ///
 
+TEST ///
+R=QQ[x,y,z,Degrees=>{9,11,13}];
+S=QQ[t]
+I=kernel(map(S,R,{t^9,t^11,t^13}))
+J=ideal(apply(flatten entries gens gb I,leadTerm))
+assert(waldschmidt(I)==22)
+assert(waldschmidt(J)==22)
+///
 
 ----isKonig
 TEST ///
@@ -2119,3 +2133,12 @@ waldschmidt I
 
 -- Paper Example Lower bound on resurgence
 lowerBoundResurgence(I)
+
+
+
+------testing CIPRimes
+loadPackage "SymbolicPowers"
+loadPackage "Points"
+I=randomPoints(2,10);
+time symbolicPower(I,6,CIPrimes=>true);
+time symbolicPower(I,6);
