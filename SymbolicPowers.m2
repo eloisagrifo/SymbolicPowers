@@ -190,10 +190,10 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
     
     if opts.CIPrimes then (
 	        if (Pd :=primaryDecomposition I;
-		    all(Pd,i->(dim(R)-dim(i))==#flatten(entries(mingens i)))) then (
+		    all(Pd,i->(dim(R)-dim(I))==#flatten(entries(mingens i)))) then (
 		    return intersect apply(Pd, i->fastPower(i,n)) 
 		    ) else (
-		     print "Associated primes are not complete intersections.")
+		     print "Associated primes are not complete intersections of the same height.")
 		);
 		    
         
@@ -1724,7 +1724,7 @@ doc ///
     	an option to compute the symbolic power by taking the intersection of the powers of the primary components
     Description
     	Text
-	    The default value is false.  When defined to be true, the @TO symbolicPower@ function tests whether each primary component is a complete intersection.  If each component is, then the function takes the intersection of the powers of the components:
+	    The default value is false.  When defined to be true, the @TO symbolicPower@ function tests whether the primary components are complete intersections having the same height.  If each component is, then the function takes the intersection of the powers of the components:
 	     $$I^{(n)}=\cap_{p\in Ass(R/I)} p^n.$$
     SeeAlso
     	containmentProblem
