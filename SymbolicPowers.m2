@@ -771,7 +771,7 @@ doc ///
 	      symbolicContainmentMonomialCurve(ZZ/101,{3,4,5},3,2)
 	      
      	 Text
-	      Or we simply ask for the symbolic powers of these ideals. For example, here is the third of the same ideal:
+	      Or we simply ask for the symbolic powers of these ideals. For example, here is the third symbolic power of the same ideal:
 	      
 	 Example     
 	      symbolicPowerMonomialCurve(ZZ/101,{3,4,5},3)
@@ -1400,6 +1400,10 @@ doc ///
 	 (lowerBoundResurgence,Ideal)
      Headline 
          computes a lower bound for the resurgence of a given ideal.
+     Description
+       Text
+           The resurgence of an ideal $I$, defined by Harbourne and Bocci, is given by
+	 $\rho(I) :=$ sup $\lbrace a/b : I^{(a)}$ &nsub; $I^b \rbrace.$
      Usage 
          lowerBoundResurgence(Ideal)
      Inputs 
@@ -1408,7 +1412,7 @@ doc ///
           :QQ
      Description	  
        Text
-	   Given an ideal $I$, finds the maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ the optional input SampleSize.
+	   Given an ideal $I$, finds the maximum of the quotients $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ the optional input SampleSize.
 
        Example 
 	   T = QQ[x,y,z];
@@ -1431,7 +1435,7 @@ doc ///
      Description	  
        Text
 	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
-	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$ 
+	   maximum of the quotients $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq n$ 
 	   and $\frac{\alpha(I)}{waldschmidt(I)}$. 
 
        Example 
@@ -1451,9 +1455,8 @@ doc ///
          lowerBoundResurgence(I,SampleSize=>ZZ)
      Description	  
          Text
-       	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
-	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@
-	   and $\frac{\alpha(I)}{waldschmidt(I)}$.
+       	   Given an ideal $I$ and an integer $n$, returns the larger of the two numbers $\frac{\alpha(I)}{waldschmidt(I)}$ 
+	   and the maximum of the quotients $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@.
      
          Example
            R = QQ[x,y,z];
@@ -1476,7 +1479,7 @@ doc ///
      Description	  
        Text
 	   Given an ideal $I$ and an integer $n$, returns the larger value between the 
-	   maximum of the quotiens $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@ 
+	   maximum of the quotients $m/k$ that fail $I^{(m)} \subseteq I^k$ with $k \leq$ @TO SampleSize@ 
 	   and $\frac{\alpha(I)}{waldschmidt(I)}$. 
 
        Example 
