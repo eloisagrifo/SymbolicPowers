@@ -119,7 +119,7 @@ minimalPart(Ideal) := Ideal => I -> (
 
 
 isMonomial = method()
-isMonomial(RingElement) := r -> (terms(r) == {r})
+isMonomial(RingElement) := r -> # terms r === 1 --(terms(r) == {r})
 isMonomial(MonomialIdeal) := I -> true
 isMonomial(Ideal) := I -> all(flatten entries mingens I,a -> isMonomial(a))
 
@@ -132,9 +132,6 @@ frobeniusPower = method(TypicalValue => Ideal)
 frobeniusPower(Ideal,ZZ) := Ideal => (I,q) -> (
     ideal(apply(flatten entries gens I, i -> i^q))
     )
-
-
-
 
 
 
@@ -165,23 +162,26 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
 	)
     )
 
-symbPowerPrime = method()
-symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (
-        primaryList := primaryDecomposition(fastPower(I,n)); 
-	local result;
-	scan(primaryList, i -> if radical(i)==I then (result = i; break));
-	result
-	)
+
+-- symbPowerPrime = method()
+-- symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (
+--         primaryList := primaryDecomposition(fastPower(I,n)); 
+-- 	local result;
+-- 	scan(primaryList, i -> if radical(i)==I then (result = i; break));
+-- 	result
+-- 	)
     
-symbPowerPrimary = method()
-symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (
-        rad := radical(I);
-	local result;
-	primaryList := primaryDecomposition(fastPower(I,n)); 
-	scan(primaryList,i->(if radical(i)==rad then result := i; break));
-	result
-	)
-    
+-- symbPowerPrimary = method()
+-- symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (
+--         rad := radical(I);
+-- 	local result;
+-- 	primaryList := primaryDecomposition(fastPower(I,n)); 
+-- 	scan(primaryList,i->(if radical(i)==rad then result := i; break));
+-- 	result
+-- 	)
+
+  
+   
 symbPowerSat = method(TypicalValue => Ideal)
 symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
     R := ring I; 
@@ -214,8 +214,9 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 	    return intersect apply(Pd, i->fastPower(i,n)) 
 	    ) 
 	else (
-	    print "Associated primes are not complete intersections of the same height.")
-	    );
+	    error "Associated primes are not complete intersections of the same height."
+	    )
+	);
 		    
         
     if not opts.UseMinimalPrimes 
@@ -341,14 +342,15 @@ joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (
     R := ring I; 
     k := coefficientRing(R);
     d := dim(R);
-    S := k[vars 1 .. vars (3*d)];
-    i := map(S, R, {(vars (d+1))_S .. (vars (2*d))_S});
-    j := map(S, R, {(vars (2*d+1))_S .. (vars (3*d))_S});
+    x := local x;
+    S := k[x_1 .. x_(3*d)];
+    i := map(S, R, {(x_(d+1))_S .. (x_(2*d))_S});
+    j := map(S, R, {(x_(2*d+1))_S .. (x_(3*d))_S});
     use S;
-    aux := i -> (vars i)_S - (vars (d+i))_S - (vars (2*d+i))_S;
+    aux := i -> (x_i)_S - (x_(d+i))_S - (x_(2*d+i))_S;
     extra := apply(toList(1 .. d), aux);
     bigideal := ideal(i(I),j(J), ideal(extra));
-    inc := map(S,R,{(vars 1)_S .. (vars d)_S});
+    inc := map(S,R,{(x_1)_S .. (x_d)_S});
     preimage(inc,bigideal)
     )
     
@@ -420,17 +422,13 @@ symbolicPowerMonomialCurve(Ring,List,ZZ) := Ideal => (k,L,m) -> (
 
 exponentsMonomialGens = method(TypicalValue => List)
 exponentsMonomialGens(Ideal) := List => I -> (
-    local L; 
-    L = flatten entries mingens I;
-    apply(L, l -> flatten exponents l)    
+    apply(flatten entries mingens I, l -> flatten exponents l)    
     )
 
 squarefreeGens = method()
 squarefreeGens(Ideal) := List => I -> (
-    w := exponentsMonomialGens(I);
-    v := select(w,i -> all(i,o -> o<2));
-    R := ring I;
-    l := flatten entries vars R;
+    v := select(exponentsMonomialGens(I),i -> all(i,o -> o<2));
+    l := flatten entries vars ring I;
     apply(v,o->product(apply(toList pairs(o),(i,j)->(l_i)^j)))
     )
 
@@ -438,9 +436,7 @@ squarefreeGens(Ideal) := List => I -> (
 --Finds squarefree monomials generating I^c, where c=codim I
 squarefreeInCodim = method()
 squarefreeInCodim(Ideal) := List => I -> (
-    c := codim I;
-    J := fastPower(I,c);
-    squarefreeGens(J)
+    squarefreeGens(fastPower(I,codim I))
     )
 
 
@@ -449,9 +445,7 @@ isKonig(Ideal) := Boolean => I -> (
     R := ring I;
     if I == ideal 1_R then true else (
 	if I == ideal(0_R) then true else (
-	    c := codim I; 
-	    J := fastPower(I,c);
-	    not(squarefreeGens(J)=={})
+	    not(squarefreeGens(fastPower(I,codim I))=={})
 	    )
 	)
     )
@@ -511,8 +505,7 @@ noPackedSub(Ideal) := List => I -> (
 noPackedAllSubs = method(TypicalValue => List)
 noPackedAllSubs(Ideal) := List => I -> (
     var := flatten entries vars ring I; 
-    d := # var;
-    s := delete({},subsets(d));
+    s := delete({},subsets(# var));
     w := flatten(table(s,s,(a,b) -> {a,b}));
     w = select(w, i -> unique(join(i_0,i_1))==join(i_0,i_1));
     allFailures := select(w,x -> not(isKonig(replaceVarsBy1(replaceVarsBy0(I,x_0),x_1))));
@@ -555,7 +548,7 @@ symbolicPolyhedron = method();
 
 symbolicPolyhedron Ideal := Polyhedron => I -> (
     if not isMonomial(I) then ( 
-	print "Error -- symbolicPolyhedron cannot be applied for an ideal that is not monomial"; 
+	error "symbolicPolyhedron cannot be applied for an ideal that is not monomial"; 
 	return
 	);
     
@@ -585,12 +578,12 @@ alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0)
 waldschmidt = method(Options=>{SampleSize=>5});
 waldschmidt Ideal := opts -> I -> (
     if isMonomial I then ( 
-    	print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
+--    	print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
     	N:=symbolicPolyhedron I;
     	return min flatten entries ((transpose vertices N) * (matrix degrees ring I) )
     	)
     else (
-    	print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
+--    	print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
     	return min for i from 1 to opts#SampleSize  list alpha(symbolicPower(I,i))/i
     	)
     )
@@ -615,7 +608,7 @@ lowerBoundResurgence(Ideal) := opts  -> (I) -> (
 
 asymptoticRegularity = method(Options=>{SampleSize=>10});
 asymptoticRegularity Ideal := opts -> I -> (
-    print ("The asymptotic regularity is approximated using first "| opts#SampleSize |" powers.");
+--    print ("The asymptotic regularity is approximated using first "| opts#SampleSize |" powers.");
     return min for i from 1 to opts#SampleSize  list regularity(symbolicPower(I,i))/i
     ) 
 
@@ -2145,6 +2138,11 @@ installPackage"SymbolicPowers"
 viewHelp"SymbolicPowers"
 check"SymbolicPowers"
 
+needsPackage"SymbolicPowers"
+R = QQ[x,y]
+I = ideal"x+y"
+symbolicPolyhedron I
+
 restart
 -- Paper Example Ideal of height dim R-1
 loadPackage "SymbolicPowers";
@@ -2189,7 +2187,7 @@ R=QQ[x,y,z];
 I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
 waldschmidt I
 
--- Paper Example Lower bound on resurgence
+
 lowerBoundResurgence(I)
 
 
