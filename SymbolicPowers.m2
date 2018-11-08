@@ -58,10 +58,11 @@ needsPackage "Depth";
 ---------------------------------------------------------------
 
 fastPower = method(TypicalValue => Ideal)
-fastPower(Ideal,ZZ) := Ideal => (I,n) ->
-(J := I;
-(for i from 2 to n do J = J*I);
-J)
+fastPower(Ideal,ZZ) := Ideal => (I,n) -> (
+    J := I;
+    for i from 2 to n do J = J*I;
+    return J
+    )
 
 
 --old version of big height
@@ -75,41 +76,46 @@ J)
 
 
 bigHeight = method(TypicalValue => ZZ)
-bigHeight(Ideal) := ZZ => I -> (if isPrimary(I) then codim(I) else 
-    (R := ring I; 
+bigHeight(Ideal) := ZZ => I -> (
+    if isPrimary(I) then return codim(I) else (
+	R := ring I; 
 	d := dim R; 
 	c := codim I; 
 	M := R^1/I; 
 	ans := d;
-	scan(reverse toList (c .. d), 
-	    i -> (if codim Ext^i(M,R) == i then (ans = i; break)));
-	ans    	    	
+	scan(reverse toList (c .. d), i -> (if codim Ext^i(M,R) == i then (ans = i; break)));
+	return ans
 	)
     )
 
 
 assPrimesHeight = method(TypicalValue => List)
 assPrimesHeight(Ideal) := List => I -> (
-    if isPrimary(I) then {codim(I)} else 
-    (R := ring I; 
+    if isPrimary(I) then {codim(I)} else (
+	R := ring I; 
 	d := dim R; 
 	c := codim I; 
 	M := R^1/I; 
 	l := toList (c .. d);
 	w := apply(l, i->Ext^i(M,R)); 
 	v := apply(w,codim);
-	reverse apply(positions(reverse(v-l),i->i==0), j -> d-j)))
+	reverse apply(positions(reverse(v-l),i->i==0), j -> d-j)
+	)
+    )
 
 
 
 minimalPart = method()
-minimalPart(Ideal) := Ideal => I -> (minPrimes := minimalPrimes (I);
+minimalPart(Ideal) := Ideal => I -> (
+    minPrimes := minimalPrimes (I);
     primDec := primaryDecomposition(I);
     minComponents := {};
-    scan(primDec, i -> (rad := radical(i); scan(minPrimes, a -> 
-		if rad == a then 
-		(minComponents = append(minComponents,i); break))));
-    intersect(minComponents))
+    scan(primDec, i -> (
+    	rad := radical(i); 
+	scan(minPrimes, a -> if rad == a then (minComponents = append(minComponents,i); break))
+	));
+    intersect(minComponents)
+    )
 
 
 isMonomial = method()
@@ -123,8 +129,9 @@ minDegreeSymbPower(Ideal,ZZ) := ZZ => (I,n) -> min flatten degrees symbolicPower
 
 --Given an ideal I and q=p^e, computes the e-th Frobenius power of I
 frobeniusPower = method(TypicalValue => Ideal)
-frobeniusPower(Ideal,ZZ) := Ideal => (I,q) -> 
-ideal(apply(flatten entries gens I, i -> i^q))
+frobeniusPower(Ideal,ZZ) := Ideal => (I,q) -> (
+    ideal(apply(flatten entries gens I, i -> i^q))
+    )
 
 
 
@@ -141,25 +148,30 @@ ideal(apply(flatten entries gens I, i -> i^q))
 
 symbPowerMon = method(TypicalValue => Ideal)
 symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
-    if isSquareFree I then 
-    (assP := associatedPrimes(I); 
-    intersect apply(assP, i -> fastPower(i,n)))
+    if isSquareFree I 
+    then (
+	assP := associatedPrimes(I); 
+	intersect apply(assP, i -> fastPower(i,n))
+	)
     else (
-    --If I is simply monomial, one can collect the primary components in a decomposition
-    --of I and intersect the powers of the *maximal* ones
-    Pd:=primaryDecomposition I;
-    P:=apply(Pd, a-> radical a);
-    maxP:={};
-    apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
-    Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
-    intersect apply(Q,i -> fastPower(i,n))))
+	--If I is simply monomial, one can collect the primary components in a decomposition
+	--of I and intersect the powers of the *maximal* ones
+	Pd:=primaryDecomposition I;
+    	P:=apply(Pd, a-> radical a);
+    	maxP:={};
+    	apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
+    	Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
+    	intersect apply(Q,i -> fastPower(i,n))
+	)
+    )
 
 symbPowerPrime = method()
 symbPowerPrime(Ideal,ZZ) := Ideal => (I,n) -> (
         primaryList := primaryDecomposition(fastPower(I,n)); 
 	local result;
 	scan(primaryList, i -> if radical(i)==I then (result = i; break));
-	result)
+	result
+	)
     
 symbPowerPrimary = method()
 symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (
@@ -167,51 +179,64 @@ symbPowerPrimary(Ideal, ZZ) := Ideal => (I,n) -> (
 	local result;
 	primaryList := primaryDecomposition(fastPower(I,n)); 
 	scan(primaryList,i->(if radical(i)==rad then result := i; break));
-	result)
+	result
+	)
     
 symbPowerSat = method(TypicalValue => Ideal)
-symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (R := ring I; 
+symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
+    R := ring I; 
     m := ideal vars R; 
-    saturate(fastPower(I,n),m))
+    saturate(fastPower(I,n),m)
+    )
 
 --Takes a primary decomposition of I^n, picks the components corresponding to the 
 --minimal primes of I and intersects them
 symbPowerSlow = method(TypicalValue => Ideal)
-symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (assI := associatedPrimes(I);
+symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (
+    assI := associatedPrimes(I);
     decomp := primaryDecomposition fastPower(I,n);
-    intersect select(decomp, a -> any(assI, i -> radical a==i)))
+    intersect select(decomp, a -> any(assI, i -> radical a==i))
+    )
 
 
 symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false,CIPrimes => false})
-symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
-    
-    
+symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
+    R := ring I;
+        
     if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
     
     if opts.CIPrimes then (
-	        if (Pd :=primaryDecomposition I;
-		    all(Pd,i->(dim(R)-dim(I))==#flatten(entries(mingens i)))) then (
-		    return intersect apply(Pd, i->fastPower(i,n)) 
-		    ) else (
-		     print "Associated primes are not complete intersections of the same height.")
-		);
+        if (
+	    Pd :=primaryDecomposition I;
+	    all(Pd,i->(dim(R)-dim(I))==#flatten(entries(mingens i)))
+	    ) 
+	then (
+	    return intersect apply(Pd, i->fastPower(i,n)) 
+	    ) 
+	else (
+	    print "Associated primes are not complete intersections of the same height.")
+	    );
 		    
         
-    if not opts.UseMinimalPrimes then (    
-    	if (isPolynomialRing R and isMonomial I) then (
-		return symbPowerMon(monomialIdeal(I),n)
-	    ) else (
-	      	    if (codim I == dim R - 1 and isHomogeneous(I)) then (
-		  if depth (R/I) == 0 then return fastPower(I,n) else 
-		  return symbPowerSat(I,n) 
-		) else (if (isPolynomialRing R and
-		bigHeight I == codim I) then return topComponents(fastPower(I,n)) 
-		      else return symbPowerSlow(I,n)
-	    	    )
-		)	    
-    )       
-    
-)
+    if not opts.UseMinimalPrimes 
+    then (    
+    	if (isPolynomialRing R and isMonomial I) 
+	then (
+	    return symbPowerMon(monomialIdeal(I),n)
+	    ) 
+	else (
+	    if (codim I == dim R - 1 and isHomogeneous(I)) 
+	    then (
+		if depth (R/I) == 0 then return fastPower(I,n) else return symbPowerSat(I,n) 
+		) 
+	    else (
+		if (isPolynomialRing R and bigHeight I == codim I) 
+		then return topComponents(fastPower(I,n)) 
+		else return symbPowerSlow(I,n)
+		)
+	    )
+	)
+    )
 
 
 -----------------------------------------------------------
@@ -222,10 +247,13 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (R := ring I;
 
 
 isSymbolicEqualOrdinary = method(TypicalValue => Boolean)
-isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (Q := fastPower(P,n); 
+isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (
+    Q := fastPower(P,n); 
     h := bigHeight(P);
     if bigHeight(Q) > h then false else (
-	if h==codim(P) then true else symbolicPower(P,n)==Q))
+	if h==codim(P) then true else symbolicPower(P,n)==Q
+	)
+    )
     
 
 
@@ -235,9 +263,12 @@ isSymbPowerContainedinPower(Ideal,ZZ,ZZ) := Boolean => opts -> (I,m,n) -> (
     h := bigHeight I; 
     if m<n then false else (
 	if m>= h*n then true else (
-	symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
-	pow := fastPower(I,n); 
-	isSubset(symb,pow))))
+	    symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
+	    pow := fastPower(I,n); 
+	    isSubset(symb,pow)
+	    )
+	)
+    )
 
 
 
@@ -247,17 +278,20 @@ containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 
     if not(opts.InSymbolic) then (
 	m := n; 
-	while 
-	not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes)) 
-	do m = m+1; return(m));
+	while not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes)) 
+	do m = m+1; 
+	return(m)
+	);
     
     if opts.InSymbolic then (
-    h := bigHeight(I);
-    e := (n-n%h)/h; 
-    l := lift(e,ZZ);
-    while isSymbPowerContainedinPower(I,n,l+1,
-	UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes) do l = l+1;
-    return l))
+	h := bigHeight(I);
+	e := (n-n%h)/h; 
+	l := lift(e,ZZ);
+	while isSymbPowerContainedinPower(I,n,l+1,UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes) 
+	do l = l+1;
+	return l
+	)
+    )
 
 
 
@@ -276,8 +310,7 @@ containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 --Given integers a and p, finds the largest power of p such that p^k<=a
 --auxiliary for symbPowerPrimePosChar
 powersdivision = method(TypicalValue => ZZ)
-powersdivision(ZZ,ZZ,ZZ) := ZZ => (a,p,k) -> (if p^k>a then 1 else 
-    1+(powersdivision(a,p,k+1)))
+powersdivision(ZZ,ZZ,ZZ) := ZZ => (a,p,k) -> ( if p^k>a then 1 else 1+(powersdivision(a,p,k+1)) )
 powersdivision(ZZ,ZZ) := ZZ => (a,p) -> powersdivision(a,p,1)
 
 
@@ -286,17 +319,27 @@ powersdivision(ZZ,ZZ) := ZZ => (a,p) -> powersdivision(a,p,1)
 -- $q=p^k \leqslant a$
 --$I^{(a)} = (I^{[q]} : I^{a-q+1})$
 symbPowerPrimePosChar = method(TypicalValue => Ideal)
-symbPowerPrimePosChar(Ideal,ZZ) := Ideal => (I,n) -> (R := ring I; p := char R;
-    if not(isPrime(I)) 
-    then "Not a prime ideal" else (
+symbPowerPrimePosChar(Ideal,ZZ) := Ideal => (I,n) -> (
+    R := ring I; 
+    p := char R;
+    if not(isPrime(I)) then "Not a prime ideal" else (
 	h := codim I;
-	if p==0 then "The characteristic must be positive" else
-	(e := powersdivision(n,p); q := p^e; c := q-1; d := h*c-n+1; J:= I^d; --fastPower(I,d);
-	    (frobeniusPower(I,q)):J)))
+	if p==0 then "The characteristic must be positive" else	(
+	    e := powersdivision(n,p); 
+	    q := p^e; 
+	    c := q-1; 
+	    d := h*c-n+1; 
+	    J:= I^d; --fastPower(I,d);
+	    (frobeniusPower(I,q)):J
+	    )
+	)
+    )
 
 
 joinIdeals = method(TypicalValue => Ideal)
-joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (R := ring I; k := coefficientRing(R);
+joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (
+    R := ring I; 
+    k := coefficientRing(R);
     d := dim(R);
     S := k[vars 1 .. vars (3*d)];
     i := map(S, R, {(vars (d+1))_S .. (vars (2*d))_S});
@@ -307,12 +350,14 @@ joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (R := ring I; k := coefficientRing(
     bigideal := ideal(i(I),j(J), ideal(extra));
     inc := map(S,R,{(vars 1)_S .. (vars d)_S});
     preimage(inc,bigideal)
-    );
+    )
     
     
 symbolicPowerJoin = method(TypicalValue => Ideal);
-symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (m := ideal(generators ring p);
-    joinIdeals(p,m^n))--fastPower(m,n)))
+symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (
+    m := ideal(generators ring p);
+    joinIdeals(p,m^n)  --fastPower(m,n)))
+    )
 
 
 
@@ -323,26 +368,45 @@ symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (m := ideal(generators ring p);
 -----------------------------------------------------------
     
 curveIdeal = method(TypicalValue => Ideal)
-curveIdeal(List) := Ideal => L -> (d := #L; 
-    R := QQ(monoid[vars 1 .. vars d]); S := QQ(monoid[vars 0]); t := (gens S)_0;
-    f := map(S,R,apply(L,i->t^i)); ker f)
-curveIdeal(Ring,List) := Ideal => (k,L) -> (d := #L; 
-    R := k(monoid[vars 1 .. vars d]); S := k(monoid[vars 0]); t := (gens S)_0;
-    f := map(S,R,apply(L,i->t^i)); ker f)
+curveIdeal(List) := Ideal => L -> (
+    d := #L; 
+    R := QQ(monoid[vars 1 .. vars d]); 
+    S := QQ(monoid[vars 0]); 
+    t := (gens S)_0;
+    f := map(S,R,apply(L,i->t^i)); 
+    ker f
+    )
+
+curveIdeal(Ring,List) := Ideal => (k,L) -> (
+    d := #L; 
+    R := k(monoid[vars 1 .. vars d]); 
+    S := k(monoid[vars 0]); 
+    t := (gens S)_0;
+    f := map(S,R,apply(L,i->t^i)); 
+    ker f
+    )
     
 symbolicContainmentMonomialCurve = method(TypicalValue => Boolean);
 symbolicContainmentMonomialCurve(List,ZZ,ZZ) := Boolean => (L,m,n) -> (
     I := curveIdeal(L);
-    isSymbPowerContainedinPower(I,m,n))
+    isSymbPowerContainedinPower(I,m,n)
+    )
+
 symbolicContainmentMonomialCurve(Ring,List,ZZ,ZZ) := Boolean => (k,L,m,n) -> (
     I := curveIdeal(k,L);
-    isSymbPowerContainedinPower(I,m,n))
+    isSymbPowerContainedinPower(I,m,n)
+    )
 
 symbolicPowerMonomialCurve = method(TypicalValue => Ideal);
 symbolicPowerMonomialCurve(List,ZZ) := Ideal => (L,m) -> (
-    I := curveIdeal(L); symbolicPower(I,m))
+    I := curveIdeal(L); 
+    symbolicPower(I,m)
+    )
+
 symbolicPowerMonomialCurve(Ring,List,ZZ) := Ideal => (k,L,m) -> (
-    I := curveIdeal(k,L); symbolicPower(I,m))
+    I := curveIdeal(k,L); 
+    symbolicPower(I,m)
+    )
 
 -----------------------------------------------------------
 -----------------------------------------------------------
@@ -362,19 +426,22 @@ exponentsMonomialGens(Ideal) := List => I -> (
     )
 
 squarefreeGens = method()
-squarefreeGens(Ideal) := List => I ->(
+squarefreeGens(Ideal) := List => I -> (
     w := exponentsMonomialGens(I);
     v := select(w,i -> all(i,o -> o<2));
     R := ring I;
     l := flatten entries vars R;
-    apply(v,o->product(apply(toList pairs(o),(i,j)->(l_i)^j))))
+    apply(v,o->product(apply(toList pairs(o),(i,j)->(l_i)^j)))
+    )
 
 
 --Finds squarefree monomials generating I^c, where c=codim I
 squarefreeInCodim = method()
-squarefreeInCodim(Ideal) := List => I -> (c := codim I;
+squarefreeInCodim(Ideal) := List => I -> (
+    c := codim I;
     J := fastPower(I,c);
-    squarefreeGens(J))
+    squarefreeGens(J)
+    )
 
 
 isKonig = method(TypicalValue => Boolean)
@@ -422,32 +489,39 @@ isPacked(Ideal) := Boolean => I -> (
 
 
 noPackedSub = method(TypicalValue => List)
-noPackedSub(Ideal) := List => I -> (if not(isKonig(I)) then "The ideal itself is not Konig!" else (
-    var := flatten entries vars ring I; d := # var;
-    s := delete({},subsets(d));
-    w := flatten(table(s,s,(a,b) -> {a,b}));
-    w = select(w, i -> unique(join(i_0,i_1))==join(i_0,i_1));
-    firstFailure := select(1,w,x -> not(isKonig(replaceVarsBy1(replaceVarsBy0(I,x_0),x_1))));
-    firstFailure = flatten firstFailure;
-    varsReplacedBy0 := firstFailure_0;
-    varsReplacedBy0 = var_(varsReplacedBy0);
-    varsReplacedBy1 := firstFailure_1;
-    varsReplacedBy1 = var_(varsReplacedBy1);
-    varsReplacedBy0 = apply(apply(varsReplacedBy0,toString),i -> concatenate(i,"=>0"));
-    varsReplacedBy1 = apply(apply(varsReplacedBy1,toString),i -> concatenate(i,"=>1"));
-    varsReplacedBy0 | varsReplacedBy1))
+noPackedSub(Ideal) := List => I -> (
+    if not(isKonig(I)) then "The ideal itself is not Konig!" else (
+	var := flatten entries vars ring I; d := # var;
+    	s := delete({},subsets(d));
+    	w := flatten(table(s,s,(a,b) -> {a,b}));
+    	w = select(w, i -> unique(join(i_0,i_1))==join(i_0,i_1));
+    	firstFailure := select(1,w,x -> not(isKonig(replaceVarsBy1(replaceVarsBy0(I,x_0),x_1))));
+    	firstFailure = flatten firstFailure;
+    	varsReplacedBy0 := firstFailure_0;
+    	varsReplacedBy0 = var_(varsReplacedBy0);
+    	varsReplacedBy1 := firstFailure_1;
+    	varsReplacedBy1 = var_(varsReplacedBy1);
+    	varsReplacedBy0 = apply(apply(varsReplacedBy0,toString),i -> concatenate(i,"=>0"));
+    	varsReplacedBy1 = apply(apply(varsReplacedBy1,toString),i -> concatenate(i,"=>1"));
+    	varsReplacedBy0 | varsReplacedBy1
+	)
+    )
 
 
 noPackedAllSubs = method(TypicalValue => List)
-noPackedAllSubs(Ideal) := List => I -> (var := flatten entries vars ring I; d := # var;
+noPackedAllSubs(Ideal) := List => I -> (
+    var := flatten entries vars ring I; 
+    d := # var;
     s := delete({},subsets(d));
     w := flatten(table(s,s,(a,b) -> {a,b}));
     w = select(w, i -> unique(join(i_0,i_1))==join(i_0,i_1));
     allFailures := select(w,x -> not(isKonig(replaceVarsBy1(replaceVarsBy0(I,x_0),x_1))));
-    allSubs := apply(allFailures, 
-	o -> apply(var_(o_0),i->concatenate(toString i,"=>0")) | apply(var_(o_1),i->concatenate(toString i,"=>1")));
+    allSubs := apply(allFailures, o -> (
+	    apply(var_(o_0),i->concatenate(toString i,"=>0")) | apply(var_(o_1),i->concatenate(toString i,"=>1"))
+	    ));
     if allSubs == {} then "Only I is not Konig -- all proper substitutions are Konig." else
-    allSubs)
+    allSubs
+    )
     
 
 
@@ -463,7 +537,7 @@ symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
     F := map(S,R);
     X := symbolicPower(I,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes);
     # flatten entries mingens F(X)
-      )
+    )
 
 
 
@@ -480,26 +554,27 @@ symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
 symbolicPolyhedron = method();
 
 symbolicPolyhedron Ideal := Polyhedron => I -> (
-if not isMonomial(I) then ( 
-    print "Error -- symbolicPolyhedron cannot be applied for an ideal that is not monomial"; 
-    return
-    );   
-return symbolicPolyhedron monomialIdeal I
-)
+    if not isMonomial(I) then ( 
+	print "Error -- symbolicPolyhedron cannot be applied for an ideal that is not monomial"; 
+	return
+	);
+    
+    return symbolicPolyhedron monomialIdeal I
+    )
 
 
-symbolicPolyhedron MonomialIdeal := Polyhedron => I -> ( 
-Pd:=primaryDecomposition I;
-P:=apply(Pd, a-> radical a);
-maxP:={};
-apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
-Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
-PI:=apply(Q, a-> newtonPolytope sum flatten entries gens a);
-C := posHull id_(ZZ^(dim ring I));
-QI :=apply(PI, p-> p+C);
-N :=intersection QI;
-return N
-)
+symbolicPolyhedron MonomialIdeal := Polyhedron => I -> (
+    Pd:=primaryDecomposition I;
+    P:=apply(Pd, a-> radical a);
+    maxP:={};
+    apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
+    Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
+    PI:=apply(Q, a-> newtonPolytope sum flatten entries gens a);
+    C := posHull id_(ZZ^(dim ring I));
+    QI :=apply(PI, p-> p+C);
+    N :=intersection QI;
+    return N
+    )
 
 alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0) 
 
@@ -509,16 +584,16 @@ alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0)
 
 waldschmidt = method(Options=>{SampleSize=>5});
 waldschmidt Ideal := opts -> I -> (
-if isMonomial I then ( 
-    print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
-    N:=symbolicPolyhedron I;
-    return min flatten entries ((transpose vertices N) * (matrix degrees ring I) )
+    if isMonomial I then ( 
+    	print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
+    	N:=symbolicPolyhedron I;
+    	return min flatten entries ((transpose vertices N) * (matrix degrees ring I) )
+    	)
+    else (
+    	print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
+    	return min for i from 1 to opts#SampleSize  list alpha(symbolicPower(I,i))/i
+    	)
     )
-else (
-    print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
-    return min for i from 1 to opts#SampleSize  list alpha(symbolicPower(I,i))/i
-    )
-)
 
 waldschmidt MonomialIdeal := opts -> I -> (  
     N:=symbolicPolyhedron I;
@@ -528,7 +603,8 @@ waldschmidt MonomialIdeal := opts -> I -> (
 lowerBoundResurgence = method(TypicalValue => QQ, Options =>{SampleSize=>5,UseWaldschmidt=>false})
 lowerBoundResurgence(Ideal) := opts  -> (I) -> (
     l := max append(apply(toList(2 .. opts#SampleSize),o -> (containmentProblem(I,o)-1)/o),1);
-    if opts#UseWaldschmidt == false then return l
+    if opts#UseWaldschmidt == false 
+    then return l
     else return max {l, alpha(I)/waldschmidt(I)}
     )
 
@@ -557,7 +633,7 @@ beginDocumentation()
 
 document { 
   Key => SymbolicPowers,
-  Headline => "A package for computing symbolic powers of ideals",
+  Headline => "A package for computing symbolic powers of ideals TESTING",
    
    PARA {
        "This package gives the ability to compute symbolic powers, and related invariants,
@@ -2057,6 +2133,10 @@ assert(noPackedAllSubs I=={{"x_1=>0", "x_2=>1", "x_3=>1"}, {"x_2=>0", "x_1=>1", 
 ///
 
 end
+
+restart
+uninstallPackage"SymbolicPowers"
+loadPackage"SymbolicPowers"
 
 restart
 uninstallPackage"SymbolicPowers"
