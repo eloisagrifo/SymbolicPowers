@@ -1,12 +1,12 @@
 newPackage(
         "SymbolicPowers",
-	Version => "1.2", 
-	Date => "June 8, 2018",
+	Version => "1.3", 
+	Date => "Dec 20, 2018",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@virginia.edu", HomePage => "http://people.virginia.edu/~er2eq/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
-	DebuggingMode => false
+	DebuggingMode => true
         )
 
 
@@ -342,7 +342,7 @@ joinIdeals(Ideal,Ideal) := Ideal => (I,J) -> (
     R := ring I; 
     k := coefficientRing(R);
     d := dim(R);
-    x := local x;
+    x := getSymbol "T";
     S := k[x_1 .. x_(3*d)];
     i := map(S, R, {(x_(d+1))_S .. (x_(2*d))_S});
     j := map(S, R, {(x_(2*d+1))_S .. (x_(3*d))_S});
@@ -372,8 +372,9 @@ symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (
 curveIdeal = method(TypicalValue => Ideal)
 curveIdeal(List) := Ideal => L -> (
     d := #L; 
-    R := QQ(monoid[vars 1 .. vars d]); 
-    S := QQ(monoid[vars 0]); 
+    x := getSymbol "T";
+    R := QQ(monoid[x_1 .. x_d]); 
+    S := QQ(monoid[x_0]); 
     t := (gens S)_0;
     f := map(S,R,apply(L,i->t^i)); 
     ker f
@@ -381,8 +382,9 @@ curveIdeal(List) := Ideal => L -> (
 
 curveIdeal(Ring,List) := Ideal => (k,L) -> (
     d := #L; 
-    R := k(monoid[vars 1 .. vars d]); 
-    S := k(monoid[vars 0]); 
+    x := getSymbol "T";
+    R := k(monoid[x_1 .. x_d]); 
+    S := k(monoid[x_0]); 
     t := (gens S)_0;
     f := map(S,R,apply(L,i->t^i)); 
     ker f
