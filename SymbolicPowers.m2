@@ -35,11 +35,9 @@ export {
     "noPackedAllSubs",
     "squarefreeGens", 
     "squarefreeInCodim",    
-    "symbolicContainmentMonomialCurve",
     "symbolicDefect",
     "symbolicPower",
-    "symbolicPowerJoin",
-    "symbolicPowerMonomialCurve", 
+    "symbolicPowerJoin", 
     "symbPowerPrimePosChar",
     "symbolicPolyhedron", 
     "waldschmidt"
@@ -363,54 +361,6 @@ symbolicPowerJoin(Ideal,ZZ) := Ideal => (p,n) -> (
 
 
 
------------------------------------------------------------
------------------------------------------------------------
---Space monomial curves
------------------------------------------------------------
------------------------------------------------------------
-    
-curveIdeal = method(TypicalValue => Ideal)
-curveIdeal(List) := Ideal => L -> (
-    d := #L; 
-    x := getSymbol "T";
-    R := QQ(monoid[x_1 .. x_d]); 
-    S := QQ(monoid[x_0]); 
-    t := (gens S)_0;
-    f := map(S,R,apply(L,i->t^i)); 
-    ker f
-    )
-
-curveIdeal(Ring,List) := Ideal => (k,L) -> (
-    d := #L; 
-    x := getSymbol "T";
-    R := k(monoid[x_1 .. x_d]); 
-    S := k(monoid[x_0]); 
-    t := (gens S)_0;
-    f := map(S,R,apply(L,i->t^i)); 
-    ker f
-    )
-    
-symbolicContainmentMonomialCurve = method(TypicalValue => Boolean);
-symbolicContainmentMonomialCurve(List,ZZ,ZZ) := Boolean => (L,m,n) -> (
-    I := curveIdeal(L);
-    isSymbPowerContainedinPower(I,m,n)
-    )
-
-symbolicContainmentMonomialCurve(Ring,List,ZZ,ZZ) := Boolean => (k,L,m,n) -> (
-    I := curveIdeal(k,L);
-    isSymbPowerContainedinPower(I,m,n)
-    )
-
-symbolicPowerMonomialCurve = method(TypicalValue => Ideal);
-symbolicPowerMonomialCurve(List,ZZ) := Ideal => (L,m) -> (
-    I := curveIdeal(L); 
-    symbolicPower(I,m)
-    )
-
-symbolicPowerMonomialCurve(Ring,List,ZZ) := Ideal => (k,L,m) -> (
-    I := curveIdeal(k,L); 
-    symbolicPower(I,m)
-    )
 
 -----------------------------------------------------------
 -----------------------------------------------------------
@@ -706,8 +656,6 @@ doc ///
                $\bullet$ @TO"The Containment Problem"@
 	       
 	       $\bullet$ @TO"Sullivant's algorithm for primes in a polynomial ring"@
-	       
-	       $\bullet$ @TO"Monomial curves"@
     	       	     
 	       {\bf The Packing Problem}
 	       
@@ -826,27 +774,6 @@ doc ///
 	      symbolicPowerJoin(P,2)
 ///
 
-
-
-doc ///
-     Key
-     	  "Monomial Curves"
-     Description
-     	 Text
-	      To test containments of symbolic and ordinary powers of ideals defining monomial curves, we can skip the step where we define the ideals.
-	      
-     	 Text
-	      For example, if $I$ is the ideal defining the monomial curve defined by $t^3, t^4, t^5$ over $\mathbb{Z}/101$, we can ask whether $I^{(3)} \subseteq I^2$:
-	      
-	 Example     
-	      symbolicContainmentMonomialCurve(ZZ/101,{3,4,5},3,2)
-	      
-     	 Text
-	      Or we simply ask for the symbolic powers of these ideals. For example, here is the third symbolic power of the same ideal:
-	      
-	 Example     
-	      symbolicPowerMonomialCurve(ZZ/101,{3,4,5},3)
-///
 
 
 
@@ -1223,68 +1150,7 @@ doc ///
 	   symbolicPowerJoin(ideal(x,y),2) 
      SeeAlso 
 	  joinIdeals
-/// 
-
-
-
-
-doc ///
-     Key 
-         symbolicContainmentMonomialCurve
-	 (symbolicContainmentMonomialCurve,List,ZZ,ZZ)
-	 (symbolicContainmentMonomialCurve,Ring,List,ZZ,ZZ)
-     Headline 
-         tests the containment of symbolic in ordinary powers of ideals for monomial curves.
-     Usage 
-         symbolicContainmentMonomialCurve(L,m,n)
-	 symbolicContainmentMonomialCurve(k,L,m,n)
-     Inputs 
-     	  k:Ring
-	  L:List
-	  m:ZZ
-	  n:ZZ
-     Outputs
-          :Boolean
-     Description	  
-       Text
-	   Tests whether $I^{(m)} \subseteq I^n$, where $I$ is the defining ideal for the monomial curve defined by $t^{a_1}, \ldots, t^{a_n}$. 
-	   If no field is provided, the ideal is defined over $\mathbb{Q}$.
-
-       Example 
-	   symbolicContainmentMonomialCurve({3,4,5},3,2) 
-     SeeAlso 
-	  isSymbPowerContainedinPower
-	  symbolicPowerMonomialCurve
-/// 
-
-
-
-doc ///
-     Key 
-         symbolicPowerMonomialCurve
-	 (symbolicPowerMonomialCurve,List,ZZ)
-	 (symbolicPowerMonomialCurve,Ring,List,ZZ)
-     Headline 
-         computes the symbolic powers of ideals defining monomial curves.
-     Usage 
-         symbolicPowerMonomialCurve(L,m)
-	 symbolicPowerMonomialCurve(k,L,m)
-     Inputs 
-     	  k:Ring
-	  L:List
-	  m:ZZ
-     Outputs
-          :Ideal
-     Description	  
-       Text
-	   Finds the $m$-th symbolic power of $I$, where $I$ is the defining ideal for the monomial curve defined 
-	   by $t^{a_1}, \ldots, t^{a_n}$. If no field is provided, the ideal is defined over $\mathbb{Q}$.
-
-       Example 
-	   symbolicPowerMonomialCurve({3,4,5},3) 
-     SeeAlso 
-	  containmentProblem
-/// 
+///
 
 
 
@@ -2001,20 +1867,6 @@ I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3))
 assert(containmentProblem(I,4,InSymbolic => true)==2)
 ///
 
-----symbolicContainmentMonomialCurve
-TEST ///
-R=QQ[x,y,z]
-assert(symbolicContainmentMonomialCurve({1,2,3},4,5)==false)
-///
-
-TEST ///
-R=QQ[x,y,z]
-assert(symbolicContainmentMonomialCurve({1,2,3},5,4)==true)
-///
-
-TEST ///
-assert(symbolicContainmentMonomialCurve(QQ[w,x,y,z],{2,3},3,2)==true)
-///
 ----squarefreeGens
 TEST ///
 R=ZZ/5[w,x,y,z]
@@ -2039,13 +1891,6 @@ TEST ///
 R=ZZ/2[x,y,z]
 I=ideal(x,y)
 assert(squarefreeInCodim I=={x*y})
-///
-
-----symbolicPowerMonomialCurve
-TEST ///
-I= symbolicPowerMonomialCurve({1,2,1},2)
-R=ring I
-assert(I==ideal(R_0^2-2*R_0*R_2+R_2^2,R_0*R_2^2-R_2^3-R_0*R_1+R_1*R_2,R_2^4-2*R_1*R_2^2+R_1^2))
 ///
 
 -- symbolicPolyhedron
