@@ -1,9 +1,9 @@
 newPackage(
         "SymbolicPowers",
 	Version => "1.3", 
-	Date => "Dec 20, 2018",
+	Date => "Dec 24, 2018",
 	Authors => {
-	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@virginia.edu", HomePage => "http://people.virginia.edu/~er2eq/"}
+	    {Name => "Eloisa Grifo", Email => "grifo@umich.edu", HomePage => "http://www-personal.umich.edu/~grifo/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
 	DebuggingMode => true
@@ -578,7 +578,7 @@ beginDocumentation()
 
 document { 
   Key => SymbolicPowers,
-  Headline => "A package for computing symbolic powers of ideals TESTING",
+  Headline => "A package for computing symbolic powers of ideals",
    
    PARA {
        "This package gives the ability to compute symbolic powers, and related invariants,
