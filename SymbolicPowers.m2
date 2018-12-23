@@ -584,17 +584,17 @@ document {
        "This package gives the ability to compute symbolic powers, and related invariants,
        of ideals in a polynomial ring or a quotient of a polynomial ring. For example, 
        in the context of the default behavior, ", TO "symbolicPower", " assumes the 
-       following definition of the symbolic power of an ideal ", TEX /// I ///, ",", 
+       following definition of the symbolic power of an ideal ", TEX /// $I$, ///, 
        TEX /// $$I^{(n)} = \cap_{p \in Ass(R/I)}(I^nR_p \cap R ),$$ ///,
        "as defined by M. Hochster and C. Huneke."},
 
    PARA {"Alternatively, as defined in Villarreal, ", TO "symbolicPower", 
        " has the option to restrict to minimal primes versus use all associated 
-       primes with ", TO "UseMinimalPrimes", ".", "In particular, the 
-       symbolic power of an ideal ", TEX ///I ///, " is defined as", 
+       primes with ", TO "UseMinimalPrimes", ".", " In particular, the 
+       symbolic power of an ideal ", TEX ///$I$ ///, " is defined as", 
        TEX /// $$I^{(n)} = \cap_{p \in Min(R/I)}(I^nR_p \cap R ),$$ ///, 
-       "where ", TEX /// Min(R/I)///, " is the set of minimal primes in ", 
-       TEX /// I ///, "."},
+       "where ", TEX /// $Min(R/I)$///, " is the set of minimal primes in ", 
+       TEX /// $I$,///},
    
    UL { 
        {"M. Hochster and C. Huneke.", EM " Comparison of symbolic and ordinary powers of ideals.", 
@@ -602,7 +602,7 @@ document {
        {"R. Villarreal.", EM " Monomial algebras.", " Second edition. Monographs and Research Notes 
 	   in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5."}, 
        {"Hailong Dao, Alessandro De Stefani, Eloísa Grifo, Craig Huneke, and Luis Núñez-Betancourt. ", 
-	   EM "Symbolic powers of ideals", ", ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010")} 
+	   EM "Symbolic powers of ideals.", "in Singularities and foliations. Geometry, topology and applications, pp. 387-432, Springer Proc. Math. Stat., 222, Springer, Cham, 2018. See ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010"), "."} 
        },
   
    SUBSECTION "Contributors", "The following people have generously
