@@ -628,7 +628,6 @@ document {
   UL {
     TO "The Containment Problem",
     TO "Sullivant's algorithm for primes in a polynomial ring",
-    TO "Monomial Curves",
     TO "The Packing Problem"    
   }
 
