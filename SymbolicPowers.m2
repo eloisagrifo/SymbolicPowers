@@ -1,12 +1,12 @@
 newPackage(
         "SymbolicPowers",
-	Version => "1.3", 
+	Version => "1.5", 
 	Date => "Dec 24, 2018",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "grifo@umich.edu", HomePage => "http://www-personal.umich.edu/~grifo/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
-	DebuggingMode => true
+	DebuggingMode => false
         )
 
 
