@@ -1674,7 +1674,7 @@ doc ///
 
 
 
-{* Defunct since we change the order of the monomial tests. The symbolic powers method first considers
+-* Defunct since we change the order of the monomial tests. The symbolic powers method first considers
    Monomial Ideals so there is no need for a monomial option. 
 doc ///
     Key
@@ -1700,7 +1700,7 @@ doc ///
     SeeAlso
 	symbolicPower
 ///
-*}
+*-
 
 -- tests
 
