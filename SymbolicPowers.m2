@@ -46,6 +46,7 @@ export {
 
 needsPackage "Polyhedra";
 needsPackage "Depth";
+needsPackage "PrimaryDecomposition";
 
 
 ---------------------------------------------------------------
