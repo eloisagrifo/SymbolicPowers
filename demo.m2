@@ -1,6 +1,7 @@
 uninstallPackage "SymbolicPowers"
 restart
-path = append(path,"~/Documents/GitHub/SymbolicPowers");
+path = prepend("~/Documents/GitHub/SymbolicPowers",path);
+path = append(path,"~/Desktop");
 installPackage "SymbolicPowers"
 
 

@@ -1,7 +1,7 @@
 newPackage(
         "SymbolicPowers",
-	Version => "1.5", 
-	Date => "Jan 29, 2019",
+	Version => "2.0", 
+	Date => "May 20, 2019",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "grifo@umich.edu", HomePage => "http://www-personal.umich.edu/~grifo/"}
 	    },
@@ -260,15 +260,19 @@ isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (
 
 isSymbPowerContainedinPower = method(TypicalValue => Boolean, Options => {UseMinimalPrimes => false, CIPrimes => false})
 isSymbPowerContainedinPower(Ideal,ZZ,ZZ) := Boolean => opts -> (I,m,n) -> (
-    h := bigHeight I; 
-    if m<n then false else (
-	if m>= h*n then true else (
-	    symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
-	    pow := fastPower(I,n); 
-	    isSubset(symb,pow)
-	    )
-	)
-    )
+    if isPolynomialRing(ring(I)) 
+    then (
+	h := bigHeight I; 
+	if m<n then false else (
+	    if m>= h*n then true else (
+		symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
+		pow := fastPower(I,n); 
+		isSubset(symb,pow))))
+    else (
+	sym := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
+	po := fastPower(I,n); 
+	isSubset(sym,po)))
+	    
 
 
 
