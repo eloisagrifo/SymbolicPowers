@@ -1,6 +1,6 @@
-restart
 uninstallPackage "SymbolicPowers"
-path = append(path,"~/Documents/Workshop-2017-Berkeley/SymbolicPowers");
+restart
+path = append(path,"~/Documents/GitHub/SymbolicPowers");
 installPackage "SymbolicPowers"
 
 
