@@ -3,7 +3,7 @@ restart
 path = prepend("~/Documents/GitHub/SymbolicPowers",path);
 path = append(path,"~/Desktop");
 installPackage "SymbolicPowers"
-
+check "SymbolicPowers"
 
 --Computing Symbolic Powers
 restart
