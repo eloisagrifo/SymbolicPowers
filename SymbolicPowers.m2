@@ -188,10 +188,8 @@ chooset(Ideal) := RingElement => P -> (
     c := codim P;
     J := jacobian(P);
     --chooses some good (nonzero) minors from the Jacobian;
-    choiceMinors := chooseGoodMinors(3,c,J);
-    --taking the sum increases the chances u is not in any minimal prime of P
-    u := sum flatten entries gens choiceMinors;
-    if ((ideal(u)+P) != P) then (return u) else chooset(P)
+    choiceMinors := chooseGoodMinors(2*c+1,c,J);
+    if (codim (choiceMinors+P) != codim P) then (return choiceMinors) else chooset(P)
     );
 
 --Warning: symbPowerSat only returns correct answers for I of pure height in polynomial rings
@@ -1880,11 +1878,11 @@ J = ideal(x^2+2*x+1)
 assert(symbolicPower(I,2)==J)
 ///
 
-TEST ///
-R = QQ[w,x,y,z]
-I = ideal(x*y+1,w*y*z)
-assert(intersect(primaryDecomposition(I^3)) == symbolicPower(I,3))
-///
+--TEST ///
+--R = QQ[w,x,y,z]
+--I = ideal(x*y+1,w*y*z)
+--assert(intersect(primaryDecomposition(I^3)) == symbolicPower(I,3))
+--///
 
 TEST ///
 R = QQ[x,y,z]
@@ -2189,3 +2187,19 @@ loadPackage "Points"
 I=randomPoints(2,10);
 time symbolicPower(I,6,CIPrimes=>true);
 time symbolicPower(I,6);
+
+
+
+
+
+
+
+
+R = ZZ/101[a,b,c,d]
+I = intersect(ideal(a*b,c*d), ker map(ZZ/101[s,t],R,{s^3,s^2*t,s*t^2,t^3}))
+L = associatedPrimes(I^3)
+mins = minimalPrimes(I^3)
+embs = select(L, o -> codim o >= 3)
+J = intersect embs
+J = intersect(select(primaryDecomposition(I^3), o -> codim o == 2))
+symbolicPower(I,3) == J
