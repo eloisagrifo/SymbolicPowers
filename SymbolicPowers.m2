@@ -1,9 +1,9 @@
 newPackage(
         "SymbolicPowers",
-	Version => "2.0", 
-	Date => "May 20, 2019",
+	Version => "2.1", 
+	Date => "April 23, 2020",
 	Authors => {
-	    {Name => "Eloisa Grifo", Email => "grifo@umich.edu", HomePage => "http://www-personal.umich.edu/~grifo/"}
+	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@ucr.edu", HomePage => "https://eloisagrifo.github.io/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
 	DebuggingMode => false
@@ -16,7 +16,8 @@ export {
     "SampleSize",
     "UseMinimalPrimes",
     "UseWaldschmidt",
-    "CIPrimes", 
+    "CIPrimes",
+    "PureHeight", 
     
     -- Methods
     "asymptoticRegularity",
@@ -40,6 +41,7 @@ export {
     "symbolicPowerJoin", 
     "symbPowerPrimePosChar",
     "symbolicPolyhedron", 
+    "upperBoundResurgence",
     "waldschmidt"
     }
 
@@ -47,6 +49,7 @@ export {
 needsPackage "Polyhedra";
 needsPackage "Depth";
 needsPackage "PrimaryDecomposition";
+needsPackage "FastLinAlg"
 
 
 ---------------------------------------------------------------
@@ -56,12 +59,13 @@ needsPackage "PrimaryDecomposition";
 ---------------------------------------------------------------
 ---------------------------------------------------------------
 
-fastPower = method(TypicalValue => Ideal)
-fastPower(Ideal,ZZ) := Ideal => (I,n) -> (
-    J := I;
-    for i from 2 to n do J = J*I;
-    return J
-    )
+--fastPower no longer needed
+--fastPower = method(TypicalValue => Ideal)
+--fastPower(Ideal,ZZ) := Ideal => (I,n) -> (
+--    J := I;
+--    for i from 2 to n do J = J*I;
+--    return J
+--    )
 
 
 --old version of big height
@@ -147,7 +151,7 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
     if isSquareFree I 
     then (
 	assP := associatedPrimes(I); 
-	intersect apply(assP, i -> fastPower(i,n))
+	intersect apply(assP, i -> i^n)
 	)
     else (
 	--If I is simply monomial, one can collect the primary components in a decomposition
@@ -157,7 +161,7 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
     	maxP:={};
     	apply(P, a-> if #select(P, b-> isSubset(a,b))==1 then maxP=maxP|{a});
     	Q:=for p in maxP list (intersect select(Pd, a-> isSubset(a,p)));
-    	intersect apply(Q,i -> fastPower(i,n))
+    	intersect apply(Q,i -> i^n)
 	)
     )
 
@@ -179,30 +183,46 @@ symbPowerMon(Ideal,ZZ) := Ideal => (I,n) -> (
 -- 	result
 -- 	)
 
-  
-   
+chooset = method();
+chooset(Ideal) := RingElement => P -> (
+    c := codim P;
+    J := jacobian(P);
+    --chooses some good (nonzero) minors from the Jacobian;
+    choiceMinors := chooseGoodMinors(3,c,J);
+    --taking the sum increases the chances u is not in any minimal prime of P
+    u := sum flatten entries gens choiceMinors;
+    if ((ideal(u)+P) != P) then (return u) else chooset(P)
+    );
+
+--Warning: symbPowerSat only returns correct answers for I of pure height in polynomial rings
 symbPowerSat = method(TypicalValue => Ideal)
 symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
-    R := ring I; 
-    m := ideal vars R; 
-    saturate(fastPower(I,n),m)
+    t := chooset I;
+    saturate(I^n,t)
     )
+   
+--symbPowerSat = method(TypicalValue => Ideal)
+--symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
+--    R := ring I; 
+--    m := ideal vars R; 
+--    saturate(fastPower(I,n),m)
+--    )
 
 --Takes a primary decomposition of I^n, picks the components corresponding to the 
 --minimal primes of I and intersects them
 symbPowerSlow = method(TypicalValue => Ideal)
 symbPowerSlow(Ideal,ZZ) := Ideal => (I,n) -> (
     assI := associatedPrimes(I);
-    decomp := primaryDecomposition fastPower(I,n);
+    decomp := primaryDecomposition (I^n);
     intersect select(decomp, a -> any(assI, i -> radical a==i))
     )
 
 
-symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false,CIPrimes => false})
+symbolicPower = method(TypicalValue => Ideal, Options => {UseMinimalPrimes => false,CIPrimes => false,PureHeight => false})
 symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
     R := ring I;
         
-    if opts.UseMinimalPrimes then return (minimalPart fastPower(I,n));
+    if opts.UseMinimalPrimes then return (minimalPart (I^n));
     
     if opts.CIPrimes then (
         if (
@@ -210,7 +230,7 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 	    all(Pd,i->(dim(R)-dim(I))==#flatten(entries(mingens i)))
 	    ) 
 	then (
-	    return intersect apply(Pd, i->fastPower(i,n)) 
+	    return intersect apply(Pd, i-> i^n) 
 	    ) 
 	else (
 	    error "Associated primes are not complete intersections of the same height."
@@ -218,25 +238,61 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 	);
 		    
         
-    if not opts.UseMinimalPrimes 
-    then (    
-    	if (isPolynomialRing R and isMonomial I) 
+    if not opts.UseMinimalPrimes then (  
+    	
+	if not isPolynomialRing R then return symbPowerSlow(I,n);
+	
+	if (isPolynomialRing R and isMonomial I)
+	then return symbPowerMon(monomialIdeal(I),n);
+	
+	if (isPolynomialRing R and not(isMonomial I))
 	then (
-	    return symbPowerMon(monomialIdeal(I),n)
-	    ) 
-	else (
-	    if (codim I == dim R - 1 and isHomogeneous(I)) 
+	    if (opts.PureHeight)
 	    then (
-		if depth (R/I) == 0 then return fastPower(I,n) else return symbPowerSat(I,n) 
-		) 
+		return symbPowerSat(I,n)
+		)
 	    else (
-		if (isPolynomialRing R and bigHeight I == codim I) 
-		then return topComponents(fastPower(I,n)) 
-		else return symbPowerSlow(I,n)
+		if (
+		    isPrime I
+		    )
+		then (
+		    return symbPowerSat(I,n)
+		    )
+		else (
+		    if (
+			codim I == dim R - 1 and isHomogeneous(I)
+			)
+		    then (
+			if (
+			    depth (R/I) == 0
+			    )
+			then (
+			    return (I^n)
+			    )
+			else return saturate(I^n)
+			    )
+			else (
+			    if (
+				bigHeight I == codim I
+				)
+			    then (
+				return symbPowerSat(I,n)
+				)
+			    else (
+				if (
+			    max apply(minimalPrimes I, codim) == codim I)
+			    then (
+				return symbPowerSat(I,n)
+				)
+			    else return symbPowerSlow(I,n)
+			    )
+			)
+		    )
 		)
 	    )
 	)
-    )
+    );
+
 
 
 -----------------------------------------------------------
@@ -248,7 +304,7 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 
 isSymbolicEqualOrdinary = method(TypicalValue => Boolean)
 isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (
-    Q := fastPower(P,n); 
+    Q := P^n; 
     h := bigHeight(P);
     if bigHeight(Q) > h then false else (
 	if h==codim(P) then true else symbolicPower(P,n)==Q
@@ -258,31 +314,31 @@ isSymbolicEqualOrdinary(Ideal,ZZ) := (P,n) -> (
 
 
 
-isSymbPowerContainedinPower = method(TypicalValue => Boolean, Options => {UseMinimalPrimes => false, CIPrimes => false})
+isSymbPowerContainedinPower = method(TypicalValue => Boolean, Options => {UseMinimalPrimes => false, CIPrimes => false, PureHeight => false})
 isSymbPowerContainedinPower(Ideal,ZZ,ZZ) := Boolean => opts -> (I,m,n) -> (
     if isPolynomialRing(ring(I)) 
     then (
 	h := bigHeight I; 
 	if m<n then false else (
 	    if m>= h*n then true else (
-		symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
-		pow := fastPower(I,n); 
+		symb := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes, PureHeight => opts.PureHeight); 
+		pow := I^n; 
 		isSubset(symb,pow))))
     else (
-	sym := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes); 
-	po := fastPower(I,n); 
+	sym := symbolicPower(I,m, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes, PureHeight => opts.PureHeight); 
+	po := I^n; 
 	isSubset(sym,po)))
 	    
 
 
 
 
-containmentProblem = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false,InSymbolic => false,CIPrimes => false})
+containmentProblem = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false, InSymbolic => false, CIPrimes => false, PureHeight => false})
 containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 
     if not(opts.InSymbolic) then (
 	m := n; 
-	while not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes)) 
+	while not(isSymbPowerContainedinPower(I,m,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes, PureHeight => opts.PureHeight)) 
 	do m = m+1; 
 	return(m)
 	);
@@ -291,7 +347,7 @@ containmentProblem(Ideal,ZZ) := ZZ => opts -> (I,n) -> (
 	h := bigHeight(I);
 	e := (n-n%h)/h; 
 	l := lift(e,ZZ);
-	while isSymbPowerContainedinPower(I,n,l+1,UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes) 
+	while isSymbPowerContainedinPower(I,n,l+1,UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes, PureHeight => opts.PureHeight) 
 	do l = l+1;
 	return l
 	)
@@ -393,7 +449,7 @@ squarefreeGens(Ideal) := List => I -> (
 --Finds squarefree monomials generating I^c, where c=codim I
 squarefreeInCodim = method()
 squarefreeInCodim(Ideal) := List => I -> (
-    squarefreeGens(fastPower(I,codim I))
+    squarefreeGens(I^(codim I))
     )
 
 
@@ -402,7 +458,7 @@ isKonig(Ideal) := Boolean => I -> (
     R := ring I;
     if I == ideal 1_R then true else (
 	if I == ideal(0_R) then true else (
-	    not(squarefreeGens(fastPower(I,codim I))=={})
+	    not(squarefreeGens(I^(codim I))=={})
 	    )
 	)
     )
@@ -479,13 +535,13 @@ noPackedAllSubs(Ideal) := List => I -> (
 ---Symbolic Defect
 ---------------------------------
 
-symbolicDefect = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false,CIPrimes => false})
+symbolicDefect = method(TypicalValue => ZZ, Options => {UseMinimalPrimes => false, CIPrimes => false, PureHeight => false})
 symbolicDefect(Ideal,ZZ) := opts -> (I,n) -> (
     R := ring I;
-    Y := fastPower(I,n);
+    Y := I^n;
     S := R/Y;
     F := map(S,R);
-    X := symbolicPower(I,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes);
+    X := symbolicPower(I,n, UseMinimalPrimes => opts.UseMinimalPrimes, CIPrimes => opts.CIPrimes, PureHeight => opts.PureHeight);
     # flatten entries mingens F(X)
     )
 
@@ -550,13 +606,38 @@ waldschmidt MonomialIdeal := opts -> I -> (
     return min apply (entries transpose vertices N, a-> sum  a)
     )
 
-lowerBoundResurgence = method(TypicalValue => QQ, Options =>{SampleSize=>5,UseWaldschmidt=>false})
+lowerBoundResurgence = method(TypicalValue => QQ, Options =>{SampleSize=>5, UseWaldschmidt=>false})
 lowerBoundResurgence(Ideal) := opts  -> (I) -> (
     l := max append(apply(toList(2 .. opts#SampleSize),o -> (containmentProblem(I,o)-1)/o),1);
     if opts#UseWaldschmidt == false 
     then return l
     else return max {l, alpha(I)/waldschmidt(I)}
     )
+
+
+
+upperBoundResurgence = method(TypicalValue => QQ, Options => {PureHeight => false})
+upperBoundResurgence(Ideal,ZZ,ZZ,RR) := opts -> (I,k,s,epsilon) -> (
+    h := codim I;
+    if (not(opts.PureHeight) and not(isPrime I)) then h = bigHeight I;
+    A := k*s*h;
+    B := containmentProblem(I,A,InSymbolic => true);
+    --the resurgence is either at most upperbound
+    upperbound := A/B+epsilon;
+    --or equal to the maximum value in the following list:
+    maxr := B * ceiling( A/(B*epsilon));
+    rlist := toList(1 .. maxr);
+    mrlist := apply(rlist, o -> {o, o*h-1});
+    qlist := apply(mrlist, w -> w_1/w_0);
+    qlist = select(qlist, w -> (w >= upperbound));
+    {upperbound,max qlist}
+    )
+upperBoundResurgence(Ideal,ZZ,RR) := opts -> (I,k,epsilon) -> upperBoundResurgence(I,k,2,epsilon)
+
+
+
+
+
 
 
 -- for this function I am assuming that the asymptotic regularity is an infimum
@@ -1362,6 +1443,56 @@ doc ///
 
 ///
 
+
+
+
+doc ///
+     Key 
+         upperBoundResurgence
+	 (upperBoundResurgence,Ideal,ZZ,ZZ,RR)
+	 (upperBoundResurgence,Ideal,ZZ,RR)
+     Headline 
+         finds two values: the resurgence of the given ideal is equal to the second value or strictly below the first.
+     Description
+       Text
+           The resurgence of an ideal $I$, defined by Harbourne and Bocci, is given by
+	 $\rho(I) :=$ sup $\lbrace a/b : I^{(a)}$ &nsub; $I^b \rbrace.$
+       Text
+           This code is based on an algorithm that appears in Annika Denkert's PhD thesis, for ideals whose symbolic Rees algebra is noetherian
+     Usage 
+         upperBoundResurgence(Ideal, ZZ, ZZ, RR)
+	 upperBoundResurgence(Ideal, ZZ, RR)
+     Inputs 
+     	  I:Ideal
+	  k:ZZ
+	  s:ZZ
+	  epsilon:RR
+     Outputs
+          :QQ -- an upper bound for the resurgence
+     Description	  
+       Text
+	   Suppose that $I$ is an ideal in a regulra ring whose symbolic Rees algebra $\oplus_m I^{(m)}$ is noetherian.
+	   This is equivalent to requiring that there exists $k$ such that $I^{(kn)} \subseteq (I^{(k)})^n$ for all $n \leq 1$.
+	   We follow the algorithm presented in Annika Denkert's PhD thesis (Theorem 4.1.5), which goes as follows.
+	   
+	   Fix s and $\epsilon$. Let $A = ksh$, where $h$ is the big height of $I$, and $B$ be the largest possible with $I^{(A)} \subset I^B$.
+	   Then $\rho(I) \geq \frac{A}{B}$, and either $\rho(I) < \frac{A}{B} + \epsilon$ or $\rho$ is equal to the maximum ratio $\frac{m}{r}$ such that $h \geq \frac{m}{r} \geq \frac{A}{B} + \epsilon$ and $r < B$ceiling$(\frac{A}{B \epsilon})$.
+       Text
+	   Running upperBoundResurgence(I,k,s,epsilon) returns a pair whose first component is $\frac{A}{B} + \epsilon$, and the second component is the maximum of the ratios $\frac{m}{r}$ described above.
+       Text
+	   Running upperBoundResurgence(I,k,epsilon) takes $s = 2$ by default.
+	   
+       Example 
+	   T = QQ[x,y,z]
+	   I = ideal(x*(y^3-z^3), y*(z^3-x^3), z*(x^3-y^3))
+	   upperBoundResurgence(I,3,2,0.05)
+       Text
+	   The resurgence of I is known to be 3/2. This computations tells us it should either be less than 1.55 (with an error up to 0.05) or equal to 479/240.
+
+///
+
+
+
 doc ///
      Key 
          UseWaldschmidt
@@ -1678,58 +1809,81 @@ doc ///
 ///
 
 
+
+doc /// 
+    Key
+    	PureHeight
+	[symbolicPower,PureHeight]
+	[isSymbPowerContainedinPower,PureHeight]
+	[symbolicDefect,PureHeight]
+	[containmentProblem,PureHeight]
+    Headline
+    	an option to compute the symbolic power that speeds up the computation if all the minimal primes of I have the same height the ambient ring is a polynomial ring
+    Description
+    	Text
+	    The default value is false.  When defined to be true, the @TO symbolicPower@ function computes symbolic powers by taking a saturation with an appropriate element.
+    Caveat
+    	    If the ambient ring is not a polynomial ring, this option might lead to incorrect computations 
+    SeeAlso
+    	containmentProblem
+	isSymbPowerContainedinPower
+	symbolicDefect
+	symbolicPower
+///
+
+
 -- tests
 
 TEST ///
-   S = QQ[x,y,z];
-   I = ideal(x,y,z);
-   assert(isSymbPowerContainedinPower(I,2,2) == true)
+S = QQ[x,y,z];
+I = ideal(x,y,z);
+assert(isSymbPowerContainedinPower(I,2,2) == true)
 ///
 
 --bigHeight
 TEST ///
-R=ZZ/2[x,y,z]
-I=ideal(x,y)
+R = ZZ/2[x,y,z]
+I = ideal(x,y)
 assert(bigHeight(I)==2)
 ///
 
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x,y^3,z^2)
+R = QQ[x,y,z]
+I = ideal(x,y^3,z^2)
 assert(bigHeight I==3)
 ///
 
-
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3))
+R = QQ[x,y,z]
+I = ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3))
 assert(bigHeight(I)==2)
 ///
-
-
 --symbolicPower
 TEST ///
-R=QQ[x,y,z]
-I=ideal(y-z,x+z)
-assert(symbolicPower(I,2)==ideal(y^2-2*y*z+z^2,x*y-x*z+y*z-z^2,x^2+2*x*z+z^2))
+R = QQ[x,y,z]
+I = ideal(y-z,x+z)
+J = ideal(y^2-2*y*z+z^2,x*y-x*z+y*z-z^2,x^2+2*x*z+z^2)
+assert(J == symbolicPower(I,2))
 ///
 
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x)
-assert(symbolicPower(I,2)==ideal(x^2))
+R = QQ[x,y,z]
+I = ideal(x)
+J = ideal(x^2)
+assert(symbolicPower(I,2)==J)
 ///
 
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x+1)
-assert(symbolicPower(I,2)==ideal(x^2+2*x+1))
+R = QQ[x,y,z]
+I = ideal(x+1)
+J = ideal(x^2+2*x+1)
+assert(symbolicPower(I,2)==J)
 ///
 
 TEST ///
-R=QQ[w,x,y,z]
-I=ideal(x*y+1,w*y*z)
-assert(symbolicPower(I,3)==ideal(w^3*z^3,w^2*x*y*z^2+w^2*z^2,w*x^2*y^2*z+2*w*x*y*z+w*z,x^3*y^3+3*x^2*y^2+3*x*y+1))
+R = QQ[w,x,y,z]
+I = ideal(x*y+1,w*y*z)
+assert(intersect(primaryDecomposition(I^3)) == symbolicPower(I,3))
 ///
 
 TEST ///
@@ -1740,22 +1894,36 @@ assert(symbolicPower(I,2)==I^2)
 
 
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x*y+x*z)
-assert(symbolicPower(I,2)==ideal((x*y+x*z)^2))
+R = QQ[x,y,z]
+I = ideal(x*y+x*z)
+J = ideal((x*y+x*z)^2)
+assert(symbolicPower(I,2)==J)
 ///
 
 TEST ///
-R=QQ[x,y,z]
-I=ideal(x*(y^5-z^5),y*(z^5-x^5),z*(x^5-y^5))
+R = QQ[a,b,c,d]
+P = ker map(QQ[s,t],R,{s^3,s^2*t,s*t^2,t^3})
+assert(symbolicPower(P,4)==P^4)
+///
+
+TEST ///
+R = QQ[x,y,z]
+I = ideal(x*(y^5-z^5),y*(z^5-x^5),z*(x^5-y^5))
 assert(symbolicPower(I,3,CIPrimes => true)==symbolicPower(I,3))
+///
+
+
+TEST ///
+R = QQ[x,y,z]
+I = ker map (QQ[t], R, {t^3, t^4, t^5})
+assert(symbolicPower(I,3,PureHeight => true) == saturate(I^3))
 ///
 
 --isSymbPowerContainedinPower
 TEST ///
 R=QQ[x,y];
 
-I=ideal(x);
+I = ideal(x);
 
 assert(isSymbPowerContainedinPower(I,2,3)==false)
 ///
@@ -1834,6 +2002,7 @@ assert(joinIdeals(I,J)==ideal(x))
 ///
 
 ----symbolicPowerJoin
+--?
 
 ----containmentProblem given Symbolic Power
 TEST ///
