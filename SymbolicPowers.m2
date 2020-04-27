@@ -1,7 +1,7 @@
 newPackage(
         "SymbolicPowers",
 	Version => "2.1", 
-	Date => "April 23, 2020",
+	Date => "April 27, 2020",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@ucr.edu", HomePage => "https://eloisagrifo.github.io/"}
 	    },
@@ -719,7 +719,7 @@ document {
        {"R. Villarreal.", EM " Monomial algebras.", " Second edition. Monographs and Research Notes 
 	   in Mathematics. CRC Press, Boca Raton, FL, 2015. xviii+686 pp. ISBN: 978-1-4822-3469-5."}, 
        {"Hailong Dao, Alessandro De Stefani, Eloísa Grifo, Craig Huneke, and Luis Núñez-Betancourt. ", 
-	   EM "Symbolic powers of ideals.", "in Singularities and foliations. Geometry, topology and applications, pp. 387-432, Springer Proc. Math. Stat., 222, Springer, Cham, 2018. See ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010"), "."} 
+	   EM "Symbolic powers of ideals.", " in ", EM "Singularities and foliations. Geometry, topology and applications,", " pp. 387-432, Springer Proc. Math. Stat., 222, Springer, Cham, 2018. See ", HREF("https://arxiv.org/abs/1708.03010","https://arxiv.org/abs/1708.03010"), "."} 
        },
   
    SUBSECTION "Contributors", "The following people have generously
@@ -1889,6 +1889,7 @@ R = QQ[x,y,z]
 I = ideal(x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3))
 assert(bigHeight(I)==2)
 ///
+
 --symbolicPower
 TEST ///
 R = QQ[x,y,z]
