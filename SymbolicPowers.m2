@@ -187,10 +187,37 @@ chooset = method();
 chooset(Ideal) := RingElement => P -> (
     c := codim P;
     J := jacobian(P);
-    --chooses some good (nonzero) minors from the Jacobian;
-    choiceMinors := chooseGoodMinors(2*c+1,c,J);
-    if (codim (choiceMinors+P) != codim P) then (return choiceMinors) else chooset(P)
+    N := binomial(numColumns J, c)*binomial(numRows J, c);
+    --if N is small, take all the minors right away
+    if (N <= 200) then (return minors(c,J));
+    if (N > 200) then (
+	choiceMinors := chooseGoodMinors(3*c+1,c,J);--chooses some minors from the Jacobian;
+    	maxAttempts := 100; --experiments make this seem like a decent number of tries
+	i := 1;
+	while (codim (choiceMinors+P) == codim P and i <= maxAttempts) do (
+	    i = i+1; choiceMinors = chooseGoodMinors(3*c+1,c,J);
+	    );
+	if (i < maxAttempts) then (return choiceMinors) else (return minors(c,J))
+	);
     );
+choosetPrime = method();
+choosetPrime(Ideal) := RingElement => P -> (
+    c := codim P;
+    J := jacobian(P);
+    N := binomial(numColumns J, c)*binomial(numRows J, c);
+    --if N is small, take all the minors right away
+    if (N <= 100) then (return minors(c,J));
+    if (N > 100) then (
+	choiceMinors := chooseGoodMinors(3*c+1,c,J);--chooses some minors from the Jacobian;
+    	maxAttempts := 100; --experiments make this seem like a decent number of tries
+	i := 1;
+	while ((choiceMinors+P) == P and i <= maxAttempts) do (
+	    i = i+1; choiceMinors = chooseGoodMinors(3*c+1,c,J);
+	    );
+	if (i < maxAttempts) then (return choiceMinors) else (return minors(c,J))
+	);
+    );
+
 
 --Warning: symbPowerSat only returns correct answers for I of pure height in polynomial rings
 symbPowerSat = method(TypicalValue => Ideal)
@@ -198,6 +225,12 @@ symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
     t := chooset I;
     saturate(I^n,t)
     )
+symbPowerSatPrime = method(TypicalValue => Ideal)
+symbPowerSatPrime(Ideal,ZZ) := Ideal => (I,n) -> (
+    t := choosetPrime I;
+    saturate(I^n,t)
+    )
+
    
 --symbPowerSat = method(TypicalValue => Ideal)
 --symbPowerSat(Ideal,ZZ) := Ideal => (I,n) -> (
@@ -254,7 +287,7 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 		    isPrime I
 		    )
 		then (
-		    return symbPowerSat(I,n)
+		    return symbPowerSatPrime(I,n)
 		    )
 		else (
 		    if (
@@ -1872,6 +1905,19 @@ assert(symbolicPower(I,2)==J)
 ///
 
 TEST ///
+R = ZZ/101[a,b,c,d]
+I = intersect(ideal(a*b,c*d), ker map(ZZ/101[s,t],R,{s^3,s^2*t,s*t^2,t^3}))
+J = intersect(select(primaryDecomposition(I^3), o -> codim o == 2))
+assert(symbolicPower(I,3) == J)
+///
+
+TEST ///
+R = ZZ/127[x_1 .. x_(12)]
+P = minors(3,genericMatrix(R,x_1,3,4));
+assert(symbolicPower(P,3) == P^3)
+///
+
+TEST ///
 R = QQ[x,y,z]
 I = ideal(x+1)
 J = ideal(x^2+2*x+1)
@@ -2195,11 +2241,21 @@ time symbolicPower(I,6);
 
 
 
-R = ZZ/101[a,b,c,d]
-I = intersect(ideal(a*b,c*d), ker map(ZZ/101[s,t],R,{s^3,s^2*t,s*t^2,t^3}))
+
 L = associatedPrimes(I^3)
 mins = minimalPrimes(I^3)
 embs = select(L, o -> codim o >= 3)
 J = intersect embs
-J = intersect(select(primaryDecomposition(I^3), o -> codim o == 2))
+
 symbolicPower(I,3) == J
+time symbolicPower(I,3)
+time (chooset I)_1
+
+time minors(2,jacobian I)
+M = jacobian I
+# target M
+# source M
+viewHelp target
+
+
+N = max {numgens target M, numgens source M}
