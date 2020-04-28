@@ -295,7 +295,7 @@ symbolicPower(Ideal,ZZ) := Ideal => opts -> (I,n) -> (
 			)
 		    then (
 			if (
-			    depth (R/I) == 0
+			    saturate I != I
 			    )
 			then (
 			    return (I^n)
