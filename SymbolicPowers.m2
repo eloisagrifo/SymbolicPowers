@@ -1,9 +1,9 @@
 newPackage(
         "SymbolicPowers",
-	Version => "2.1", 
-	Date => "April 27, 2020",
+	Version => "2.2", 
+	Date => "July 7, 2025",
 	Authors => {
-	    {Name => "Eloisa Grifo", Email => "eloisa.grifo@ucr.edu", HomePage => "https://eloisagrifo.github.io/"}
+	    {Name => "Eloisa Grifo", Email => "grifo@unl.edu", HomePage => "https://eloisagrifo.github.io/"}
 	    },
 	Headline => "Calculations involving symbolic powers",
 	DebuggingMode => false
@@ -17,7 +17,8 @@ export {
     "UseMinimalPrimes",
     "UseWaldschmidt",
     "CIPrimes",
-    "PureHeight", 
+    "PureHeight",
+    "DegreeLimit",
     
     -- Methods
     "asymptoticRegularity",
@@ -40,7 +41,8 @@ export {
     "symbolicPower",
     "symbolicPowerJoin", 
     "symbPowerPrimePosChar",
-    "symbolicPolyhedron", 
+    "symbolicPolyhedron",
+    "symbolicReesAlgebra",
     "upperBoundResurgence",
     "waldschmidt"
     }
@@ -619,22 +621,25 @@ alpha = I -> min apply(flatten entries gens I, f-> (degree f)_0)
 -- Input: an ideal or a  monomial ideal 
 -- Output: a rational number
 
+
+
+
 waldschmidt = method(Options=>{SampleSize=>5});
 waldschmidt Ideal := opts -> I -> (
     if isMonomial I then ( 
 --    	print "Ideal is monomial, the Waldschmidt constant is computed exactly";   
-    	N:=symbolicPolyhedron I;
-    	return min flatten entries ((transpose vertices N) * (matrix degrees ring I) )
+    	N := symbolicPolyhedron I;
+    	return min flatten entries ((transpose vertices N) * (matrix apply(degrees ring I, a -> {sum a})))
     	)
     else (
 --    	print ("Ideal is not monomial, the  Waldschmidt constant is approximated using first "| opts#SampleSize |" powers.");
-    	return min for i from 1 to opts#SampleSize  list alpha(symbolicPower(I,i))/i
+    	return min for i from 1 to opts#SampleSize list alpha(symbolicPower(I,i))/i
     	)
     )
 
 waldschmidt MonomialIdeal := opts -> I -> (  
     N:=symbolicPolyhedron I;
-    return min apply (entries transpose vertices N, a-> sum  a)
+    return min apply (entries transpose vertices N, a -> sum a)
     )
 
 lowerBoundResurgence = method(TypicalValue => QQ, Options =>{SampleSize=>5, UseWaldschmidt=>false})
@@ -685,6 +690,61 @@ asymptoticRegularity Ideal := opts -> I -> (
 
 
 
+
+-----------------------------------------------------------
+-----------------------------------------------------------
+--Symbolic Rees algebra
+-----------------------------------------------------------
+-----------------------------------------------------------
+
+
+degreesRing' = memoize((rk, degs) -> ZZ( monoid [ Variables => #degs, DegreeRank => rk, Degrees => degs ] ))
+
+symbolicReesIdeal = method(Options => { DegreeLimit => null })
+symbolicReesIdeal(Ideal, RingElement) := o -> (I, t) -> I.cache#(symbol symbolicReesIdeal, t, o) ??= (
+    R := ring I;
+    K := coefficientRing R;
+
+    bound := o.DegreeLimit ?? 10; -- symbolicReesIdealBound I;
+    if debugLevel > 0 then printerr("computing symbolic powers up to I^(", bound, ")");
+
+    G := partition_degree flatten for p from 1 to bound list (
+	-- ~15% of the computation occurs here
+	t^p * first entries gens symbolicPower(I, p));
+
+    L := map(R^1, R^0, 0);
+    degs := {};
+    for deg in sort keys G do (
+	-- we want remainder _as subalgebras_, so reduce degree by degree
+	B := basis(deg, degreesRing'_1 degs); -- 20% of the remainder
+	M := image(matrix { G#deg } % sub(B, L)); -- ~50% of the remainder
+	if M != 0 then (
+	    M = trim M;
+	    if debugLevel > 0 then printerr("generators in degree ", toString deg, ": ", net gens M);
+	    degs |= degrees M;
+	    L |= gens M);
+	);
+    if degreeLength R == 1 then degs = flatten degs;
+    if debugLevel > 0 then printerr("found ", numcols L, " sections in degrees ", degs);
+    ideal L
+)
+
+
+symbolicReesAlgebra = method(Options => { DegreeLimit => null })
+symbolicReesAlgebra(Ideal ,RingElement) := o -> (I, t) -> I.cache#(symbol symbolicReesAlgebra, o) ??= (
+    L := symbolicReesIdeal(I, t, o);
+    degs := degrees L;
+    s := symbol s;
+    R := ring I;
+    K := coefficientRing R;
+    T := K(monoid[ s_0 .. s_(#degs - 1), Degrees => degs // gcd flatten degs ]);
+    T / ker map(R, T, gens L)
+    )
+
+
+
+
+
 -----------------------------------------------------------
 -----------------------------------------------------------
 --Documentation
@@ -724,14 +784,15 @@ document {
   
    SUBSECTION "Contributors", "The following people have generously
    contributed code or worked on our code at various Macaulay2
-   workshops.",
+   workshops:",
      
      UL {
 	 "Ben Drabkin",
 	 "Andrew Conner",
 	 "Alexandra Seceleanu",
 	 "Branden Stone",
-	 "Xuehua (Diana) Zhong"
+	 "Xuehua (Diana) Zhong",
+	 "Mahrud Sayrafi"
 	},
 
    SUBSECTION "A Quick Introduction",
@@ -1660,10 +1721,80 @@ doc ///
        Example 
 	   R = QQ[x,y,z];
 	   J = ideal (x*(y^3-z^3),y*(z^3-x^3),z*(x^3-y^3));
-	   waldschmidt(J, SampleSize=>5)
+	   waldschmidt(J, SampleSize => 5)
         
      SeeAlso 
 	  symbolicPolyhedron
+///
+
+
+
+doc ///
+     Key 
+         symbolicReesAlgebra
+	 (symbolicReesAlgebra,Ideal,RingElement)
+     Headline 
+         computes the symbolic Rees algebra of the ideal I, up to a certain degree. 
+     Usage 
+         symbolicReesAlgebra(I,t)
+     Inputs 
+     	  I:Ideal
+	  t:RingElement
+     Outputs
+          :Ring
+     Description	  
+       Text
+	   The symbolic Rees algebra of an ideal $I$ is the graded subalgebra
+	   $\oplus_{n \geqslant 0} I^{(n)} t^n$ of $R[t]$.
+       Text
+       	   While the symbolic Rees algebra may is not always finitely generated, it is finitely generated for certain nice ideals, including all monomial ideals.
+	   
+       Text
+       	   Finds the symbolic Rees algebra of $I$ up to a given degree, indicated by DegreeLimit.  
+       
+       Example 
+	   R = QQ[a, b, c, t];
+	   I = intersect(ideal"a,b", ideal"b,c", ideal"a,c");
+	   symbolicReesAlgebra(I, t, DegreeLimit => 5)
+
+       SeeAlso 
+	  symbolicReesIdeal
+///
+
+
+
+doc ///
+     Key 
+         symbolicReesIdeal
+	 (symbolicReesAlgebra,Ideal,RingElement)
+     Headline 
+         computes the symbolic Rees algebra of the ideal I, up to a certain degree. 
+     Usage 
+         symbolicReesAlgebra(I,t)
+     Inputs 
+     	  I:Ideal
+	  t:RingElement
+     Outputs
+          :Ring
+     Description	  
+       Text
+	   The symbolic Rees algebra of an ideal $I$ of $R$ is the graded subalgebra
+	   $\oplus_{n \geqslant 0} I^{(n)} t^n$ of $R[t]$.
+       Text
+       	   While the symbolic Rees algebra may is not always finitely generated,
+	   it is finitely generated for certain nice ideals, including all monomial ideals.
+	   
+       Text
+       	   Finds the ideal of $R[t]$ generated by $I^{(n)}t^n$
+	   up to a given degree $n$, indicated by DegreeLimit.  
+       
+       Example 
+	   R = QQ[a, b, c, t];
+	   I = intersect(ideal"a,b", ideal"b,c", ideal"a,c");
+	   J = symbolicReesIdeal(I, t, DegreeLimit => 5)
+
+       SeeAlso 
+	  symbolicReesAlgebra
 ///
 
 
