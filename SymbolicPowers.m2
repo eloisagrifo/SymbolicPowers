@@ -43,6 +43,7 @@ export {
     "symbPowerPrimePosChar",
     "symbolicPolyhedron",
     "symbolicReesAlgebra",
+    "symbolicReesIdeal",
     "upperBoundResurgence",
     "waldschmidt"
     }
