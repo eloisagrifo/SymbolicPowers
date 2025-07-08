@@ -1,7 +1,7 @@
 newPackage(
         "SymbolicPowers",
 	Version => "2.2", 
-	Date => "July 7, 2025",
+	Date => "July 8, 2025",
 	Authors => {
 	    {Name => "Eloisa Grifo", Email => "grifo@unl.edu", HomePage => "https://eloisagrifo.github.io/"}
 	    },
@@ -18,7 +18,7 @@ export {
     "UseWaldschmidt",
     "CIPrimes",
     "PureHeight",
-    "DegreeLimit",
+--    "DegreeLimit",
     
     -- Methods
     "asymptoticRegularity",
@@ -42,8 +42,8 @@ export {
     "symbolicPowerJoin", 
     "symbPowerPrimePosChar",
     "symbolicPolyhedron",
-    "symbolicReesAlgebra",
-    "symbolicReesIdeal",
+--    "symbolicReesAlgebra",
+--    "symbolicReesIdeal",
     "upperBoundResurgence",
     "waldschmidt"
     }
@@ -52,7 +52,7 @@ export {
 needsPackage "Polyhedra";
 needsPackage "Depth";
 needsPackage "PrimaryDecomposition";
-needsPackage "FastLinAlg"
+needsPackage "FastMinors"
 
 
 ---------------------------------------------------------------
@@ -689,58 +689,6 @@ asymptoticRegularity Ideal := opts -> I -> (
 
 
 
-
-
-
------------------------------------------------------------
------------------------------------------------------------
---Symbolic Rees algebra
------------------------------------------------------------
------------------------------------------------------------
-
-
-degreesRing' = memoize((rk, degs) -> ZZ( monoid [ Variables => #degs, DegreeRank => rk, Degrees => degs ] ))
-
-symbolicReesIdeal = method(Options => { DegreeLimit => null })
-symbolicReesIdeal(Ideal, RingElement) := o -> (I, t) -> I.cache#(symbol symbolicReesIdeal, t, o) ??= (
-    R := ring I;
-    K := coefficientRing R;
-
-    bound := o.DegreeLimit ?? 10; -- symbolicReesIdealBound I;
-    if debugLevel > 0 then printerr("computing symbolic powers up to I^(", bound, ")");
-
-    G := partition_degree flatten for p from 1 to bound list (
-	-- ~15% of the computation occurs here
-	t^p * first entries gens symbolicPower(I, p));
-
-    L := map(R^1, R^0, 0);
-    degs := {};
-    for deg in sort keys G do (
-	-- we want remainder _as subalgebras_, so reduce degree by degree
-	B := basis(deg, degreesRing'_1 degs); -- 20% of the remainder
-	M := image(matrix { G#deg } % sub(B, L)); -- ~50% of the remainder
-	if M != 0 then (
-	    M = trim M;
-	    if debugLevel > 0 then printerr("generators in degree ", toString deg, ": ", net gens M);
-	    degs |= degrees M;
-	    L |= gens M);
-	);
-    if degreeLength R == 1 then degs = flatten degs;
-    if debugLevel > 0 then printerr("found ", numcols L, " sections in degrees ", degs);
-    ideal L
-)
-
-
-symbolicReesAlgebra = method(Options => { DegreeLimit => null })
-symbolicReesAlgebra(Ideal ,RingElement) := o -> (I, t) -> I.cache#(symbol symbolicReesAlgebra, o) ??= (
-    L := symbolicReesIdeal(I, t, o);
-    degs := degrees L;
-    s := symbol s;
-    R := ring I;
-    K := coefficientRing R;
-    T := K(monoid[ s_0 .. s_(#degs - 1), Degrees => degs // gcd flatten degs ]);
-    T / ker map(R, T, gens L)
-    )
 
 
 
@@ -1564,7 +1512,7 @@ doc ///
           :QQ -- an upper bound for the resurgence
      Description	  
        Text
-	   Suppose that $I$ is an ideal in a regulra ring whose symbolic Rees algebra $\oplus_m I^{(m)}$ is noetherian.
+	   Suppose that $I$ is an ideal in a regular ring whose symbolic Rees algebra $\oplus_m I^{(m)}$ is noetherian.
 	   This is equivalent to requiring that there exists $k$ such that $I^{(kn)} \subseteq (I^{(k)})^n$ for all $n \leq 1$.
 	   We follow the algorithm presented in Annika Denkert's PhD thesis (Theorem 4.1.5), which goes as follows.
 	   
@@ -1729,74 +1677,6 @@ doc ///
 ///
 
 
-
-doc ///
-     Key 
-         symbolicReesAlgebra
-	 (symbolicReesAlgebra,Ideal,RingElement)
-     Headline 
-         computes the symbolic Rees algebra of the ideal I, up to a certain degree. 
-     Usage 
-         symbolicReesAlgebra(I,t)
-     Inputs 
-     	  I:Ideal
-	  t:RingElement
-     Outputs
-          :Ring
-     Description	  
-       Text
-	   The symbolic Rees algebra of an ideal $I$ is the graded subalgebra
-	   $\oplus_{n \geqslant 0} I^{(n)} t^n$ of $R[t]$.
-       Text
-       	   While the symbolic Rees algebra may is not always finitely generated, it is finitely generated for certain nice ideals, including all monomial ideals.
-	   
-       Text
-       	   Finds the symbolic Rees algebra of $I$ up to a given degree, indicated by DegreeLimit.  
-       
-       Example 
-	   R = QQ[a, b, c, t];
-	   I = intersect(ideal"a,b", ideal"b,c", ideal"a,c");
-	   symbolicReesAlgebra(I, t, DegreeLimit => 5)
-
-       SeeAlso 
-	  symbolicReesIdeal
-///
-
-
-
-doc ///
-     Key 
-         symbolicReesIdeal
-	 (symbolicReesAlgebra,Ideal,RingElement)
-     Headline 
-         computes the symbolic Rees algebra of the ideal I, up to a certain degree. 
-     Usage 
-         symbolicReesAlgebra(I,t)
-     Inputs 
-     	  I:Ideal
-	  t:RingElement
-     Outputs
-          :Ring
-     Description	  
-       Text
-	   The symbolic Rees algebra of an ideal $I$ of $R$ is the graded subalgebra
-	   $\oplus_{n \geqslant 0} I^{(n)} t^n$ of $R[t]$.
-       Text
-       	   While the symbolic Rees algebra may is not always finitely generated,
-	   it is finitely generated for certain nice ideals, including all monomial ideals.
-	   
-       Text
-       	   Finds the ideal of $R[t]$ generated by $I^{(n)}t^n$
-	   up to a given degree $n$, indicated by DegreeLimit.  
-       
-       Example 
-	   R = QQ[a, b, c, t];
-	   I = intersect(ideal"a,b", ideal"b,c", ideal"a,c");
-	   J = symbolicReesIdeal(I, t, DegreeLimit => 5)
-
-       SeeAlso 
-	  symbolicReesAlgebra
-///
 
 
 
